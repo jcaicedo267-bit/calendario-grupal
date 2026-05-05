@@ -5,7 +5,6 @@
     <title>Lunefia 🌙</title>
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/static/style.css">
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Sour+Gummy:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
@@ -18,6 +17,17 @@
     </div>
 
     <div id="contenedor">
+        <div id="panel-evento">
+            <h2>Agregar evento</h2>
+            <input type="text" id="titulo" placeholder="Nombre del evento">
+            <input type="date" id="fecha">
+            <select id="tipo">
+                <option value="tarea">Tarea</option>
+                <option value="examen">Examen</option>
+                <option value="proyecto">Proyecto</option>
+            </select>
+            <button onclick="guardarEvento()">Guardar</button>
+        </div>
         <div id="calendario"></div>
     </div>
 
@@ -32,10 +42,28 @@
                     center: 'title',
                     right: 'dayGridMonth,timeGridWeek,timeGridDay'
                 },
-                events: []
+                events: async function(info, successCallback) {
+                    const res = await fetch('/api/eventos');
+                    const eventos = await res.json();
+                    successCallback(eventos);
+                },
             });
             cal.render();
         });
+
+        async function guardarEvento() {
+            const titulo = document.getElementById('titulo').value;
+            const fecha = document.getElementById('fecha').value;
+            const tipo = document.getElementById('tipo').value;
+
+            await fetch('/api/eventos', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title: titulo, start: fecha, tipo: tipo })
+            });
+
+            location.reload();
+        }
     </script>
 
 </body>
