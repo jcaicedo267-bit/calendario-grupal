@@ -47,6 +47,15 @@
                     const eventos = await res.json();
                     successCallback(eventos);
                 },
+                eventClick: function(info) {
+                    if (confirm('¿Quieres borrar el evento "' + info.event.title + '"?')) {
+                        fetch('/api/eventos/borrar', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ titulo: info.event.title })
+                        }).then(() => location.reload());
+                    }
+                },
             });
             cal.render();
         });
