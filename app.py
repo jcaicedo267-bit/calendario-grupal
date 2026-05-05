@@ -39,7 +39,7 @@ def manejar_eventos():
 def borrar_evento():
     eventos = cargar_datos()
     datos_a_borrar = request.json
-    eventos = [e for e in eventos if e['titulo'] != datos_a_borrar['titulo']]
+    eventos = [e for e in eventos if e['title'] != datos_a_borrar['titulo']]
     guardar_datos(eventos)
     return jsonify({"mensaje": "Evento eliminado"})
 
