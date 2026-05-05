@@ -2,10 +2,37 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Lunefia</title>
+    <title>Lunefia 🌙</title>
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-    <h1>Bienvenida a Lunefia 🌙</h1>
-    <p>Tu calendario grupal inteligente</p>
+
+    <div id="encabezado">
+        <h1>🌙 Lunefia</h1>
+        <p>Tu calendario grupal inteligente</p>
+    </div>
+
+    <div id="contenedor">
+        <div id="calendario"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var cal = new FullCalendar.Calendar(document.getElementById('calendario'), {
+                initialView: 'dayGridMonth',
+                locale: 'es',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                },
+                events: []
+            });
+            cal.render();
+        });
+    </script>
+
 </body>
 </html>
