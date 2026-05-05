@@ -7,6 +7,7 @@
 
 body {
     background-color: #f5f0ff;
+    overflow-x: hidden;
 }
 
 #encabezado {
@@ -26,11 +27,16 @@ body {
 }
 
 #contenedor {
-    padding: 30px 40px;
+    padding: 30px 20px;
 }
 
 #calendario {
     background: white;
     border-radius: 12px;
     padding: 20px;
+}
+
+.fc {
+    max-width: 100%;
+    overflow: hidden;
 }
