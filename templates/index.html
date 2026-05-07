@@ -26,6 +26,7 @@
         <h2>Agregar evento</h2>
         <input type="text" id="titulo" placeholder="Nombre del evento">
         <input type="date" id="fecha">
+        <input type="time" id="hora">
         <select id="tipo">
             <option value="tarea">Tarea</option>
             <option value="examen">Examen</option>
@@ -50,6 +51,7 @@
             var cal = new FullCalendar.Calendar(document.getElementById('calendario'), {
                 initialView: 'dayGridMonth',
                 locale: 'es',
+                nowIndicator: true,
                 headerToolbar: {
                     left: 'prev,next today',
                     center: 'title',
@@ -90,13 +92,15 @@
             const titulo = document.getElementById('titulo').value;
             const fecha = document.getElementById('fecha').value;
             const tipo = document.getElementById('tipo').value;
+            const hora = document.getElementById('hora').value;
 
             await fetch('/api/eventos', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ title: titulo, start: fecha, tipo: tipo })
+                body: JSON.stringify({ title: titulo, start: fecha + 'T' + hora, tipo: tipo })
             });
-
+            
+            togglePanel();
             location.reload();
         }
     </script>
