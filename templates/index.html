@@ -23,16 +23,26 @@
     <button id="btn-agregar" onclick="togglePanel()">+</button>
 
     <div id="panel-evento" style="display:none">
-        <h2>Agregar evento</h2>
+ <h2>Agregar evento ✨</h2>
+
+        <label>Nombre del evento:</label>
         <input type="text" id="titulo" placeholder="Nombre del evento">
+
+        <label>Fecha:</label>
         <input type="date" id="fecha">
+
+        <label>Hora:</label>
         <input type="time" id="hora">
+
+        <label>Tipo de evento:</label>
         <select id="tipo">
-            <option value="tarea">Tarea</option>
-            <option value="examen">Examen</option>
-            <option value="proyecto">Proyecto</option>
+            <option value="Académico">Académico</option>
+            <option value="Personal">Personal</option>
+            <option value="Reunión">Reunión</option>
+            <option value="Otro">Otro</option>
         </select>
-        <button onclick="guardarEvento()">Guardar</button>
+
+        <button onclick="guardarEvento()">Guardar 💕</button>
         <button id="btn-cancelar" onclick="togglePanel()">Cancelar</button>
     </div>
 
