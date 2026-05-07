@@ -34,9 +34,79 @@ body {
     background: white;
     border-radius: 12px;
     padding: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
 }
 
 .fc {
     max-width: 100%;
-    overflow: hidden;
+}
+
+#btn-agregar {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 55px;
+    height: 55px;
+    background-color: #2d1b69;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    font-size: 30px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    z-index: 1000;
+}
+
+#btn-agregar:hover {
+    background-color: #3d2b89;
+}
+
+#panel-evento {
+    position: fixed;
+    bottom: 100px;
+    right: 30px;
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    width: 280px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    z-index: 1000;
+}
+
+#panel-evento h2 {
+    font-size: 16px;
+    color: #2d1b69;
+    margin-bottom: 16px;
+}
+
+#panel-evento input,
+#panel-evento select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: 'Sour Gummy', sans-serif;
+}
+
+#panel-evento button {
+    width: 100%;
+    padding: 10px;
+    background-color: #2d1b69;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: 'Sour Gummy', sans-serif;
+    cursor: pointer;
+    margin-bottom: 8px;
+}
+
+#btn-cancelar {
+    background-color: #aaa !important;
+}
+
+.oculto {
+    display: none !important;
 }
