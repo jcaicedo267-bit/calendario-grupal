@@ -143,13 +143,47 @@
             location.reload();
         }
 
-        // Luna: reemplaza esto con la llamada real a /api/ia
         async function cargarMensajeIA() {
             const el = document.getElementById('ia-mensaje');
             try {
-                const res = await fetch('/api/ia');
-                const data = await res.json();
-                el.textContent = data.mensaje;
+                const res = await fetch('/api/eventos');
+                const eventos = await res.json();
+
+                const hoy = new Date();
+                const en3dias = new Date();
+                en3dias.setDate(hoy.getDate() + 3);
+
+                const proximos = eventos.filter(ev => {
+                    const fecha = new Date(ev.start);
+                    return fecha >= hoy && fecha <= en3dias;
+                });
+
+                if (proximos.length === 0) {
+                    el.textContent = '¡Todo tranquilo por ahora! No tienes eventos en los próximos 3 días 🌙';
+                    return;
+                }
+
+                proximos.sort((a, b) => new Date(a.start) - new Date(b.start));
+
+                const siguiente = proximos[0];
+                const fecha = new Date(siguiente.start);
+                const diasRestantes = Math.ceil((fecha - hoy) / (1000 * 60 * 60 * 24));
+
+                const emojis = { tarea: '📘', examen: '📕', proyecto: '📗' };
+                const emoji = emojis[siguiente.tipo] || '📅';
+
+                if (diasRestantes === 0) {
+                    el.textContent = `${emoji} ¡Hoy tienes "${siguiente.title}"! Mucho ánimo 💪`;
+                } else if (diasRestantes === 1) {
+                    el.textContent = `${emoji} Mañana tienes "${siguiente.title}". ¡Ya casi!`;
+                } else {
+                    el.textContent = `${emoji} En ${diasRestantes} días: "${siguiente.title}". ¡Prepárate con tiempo!`;
+                }
+
+                if (proximos.length > 1) {
+                    el.textContent += ` (+${proximos.length - 1} más esta semana)`;
+                }
+
             } catch {
                 el.textContent = '¡Hola! Soy Lunefia IA. Pronto te avisaré sobre tus próximos eventos 🌟';
             }
