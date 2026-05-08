@@ -12,39 +12,72 @@
 <body>
 
     <div id="encabezado">
-        <h1>🌙 Lunefia</h1>
-        <p>Tu calendario grupal inteligente</p>
+        <div id="encabezado-contenido">
+            <div>
+                <h1>🌙 Lunefia</h1>
+                <p>Tu calendario grupal inteligente</p>
+            </div>
+            <div id="encabezado-puntos">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
     </div>
 
     <div id="contenedor">
         <div id="calendario"></div>
     </div>
 
+    <!-- Recuadro IA -->
+    <div id="panel-ia">
+        <div id="panel-ia-header">
+            <span id="ia-icono">🌙</span>
+            <div>
+                <p id="ia-nombre">Lunefia IA</p>
+                <span id="ia-estado">● activa</span>
+            </div>
+        </div>
+        <div id="ia-separador"></div>
+        <p id="ia-mensaje">Cargando tu resumen del día...</p>
+    </div>
+
+    <!-- Botón + -->
     <button id="btn-agregar" onclick="togglePanel()">+</button>
 
+    <!-- Panel formulario -->
     <div id="panel-evento" style="display:none">
-        <h2>Agregar evento</h2>
+        <h2>✨ Agregar evento</h2>
         <input type="text" id="titulo" placeholder="Nombre del evento">
         <input type="date" id="fecha">
         <input type="time" id="hora">
         <select id="tipo">
-            <option value="tarea">Tarea</option>
-            <option value="examen">Examen</option>
-            <option value="proyecto">Proyecto</option>
+            <option value="tarea">📘 Tarea</option>
+            <option value="examen">📕 Examen</option>
+            <option value="proyecto">📗 Proyecto</option>
         </select>
         <button onclick="guardarEvento()">Guardar</button>
         <button id="btn-cancelar" onclick="togglePanel()">Cancelar</button>
+    </div>
+
+    <!-- Modal borrar evento -->
+    <div id="modal-borrar" style="display:none">
+        <div id="modal-caja">
+            <p id="modal-texto">¿Borrar este evento?</p>
+            <div id="modal-botones">
+                <button id="modal-confirmar">🗑 Borrar</button>
+                <button id="modal-cancelar" onclick="cerrarModal()">Cancelar</button>
+            </div>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
     <script>
         function togglePanel() {
             const panel = document.getElementById('panel-evento');
-            if (panel.style.display === 'none') {
-                panel.style.display = 'block';
-            } else {
-                panel.style.display = 'none';
-            }
+            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function cerrarModal() {
+            document.getElementById('modal-borrar').style.display = 'none';
         }
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -63,7 +96,7 @@
                     successCallback(eventos);
                 },
                 eventDidMount: function(info) {
-                    const tipo = info.event.extendedProps.tipo || info.event._def.extendedProps.tipo;
+                    const tipo = info.event.extendedProps.tipo;
                     if (tipo === 'tarea') {
                         info.el.style.backgroundColor = '#4A90D9';
                         info.el.style.borderColor = '#2C6FAC';
@@ -76,16 +109,22 @@
                     }
                 },
                 eventClick: function(info) {
-                    if (confirm('¿Quieres borrar el evento "' + info.event.title + '"?')) {
+                    const modal = document.getElementById('modal-borrar');
+                    document.getElementById('modal-texto').textContent = '¿Borrar "' + info.event.title + '"?';
+                    modal.style.display = 'flex';
+
+                    document.getElementById('modal-confirmar').onclick = function() {
                         fetch('/api/eventos/borrar', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ titulo: info.event.title })
                         }).then(() => location.reload());
-                    }
+                    };
                 },
             });
             cal.render();
+
+            cargarMensajeIA();
         });
 
         async function guardarEvento() {
@@ -99,9 +138,21 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ title: titulo, start: fecha + 'T' + hora, tipo: tipo })
             });
-            
+
             togglePanel();
             location.reload();
+        }
+
+        // Luna: reemplaza esto con la llamada real a /api/ia
+        async function cargarMensajeIA() {
+            const el = document.getElementById('ia-mensaje');
+            try {
+                const res = await fetch('/api/ia');
+                const data = await res.json();
+                el.textContent = data.mensaje;
+            } catch {
+                el.textContent = '¡Hola! Soy Lunefia IA. Pronto te avisaré sobre tus próximos eventos 🌟';
+            }
         }
     </script>
 
