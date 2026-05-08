@@ -26,19 +26,7 @@
     <div id="contenedor">
         <div id="calendario"></div>
     </div>
-<!-- Mensaje motivacional -->
-<div id="mensaje-motivacional" style="
-  background: #FFF0F5;
-  border-radius: 12px;
-  padding: 15px 20px;
-  margin: 15px 0;
-  font-size: 16px;
-  font-weight: bold;
-  text-align: center;
-  color: #c0306a;
-  box-shadow: 0 2px 8px rgba(255,105,180,0.15);
-">
-</div>
+
     <!-- Recuadro IA -->
     <div id="panel-ia">
         <div id="panel-ia-header">
@@ -50,6 +38,7 @@
         </div>
         <div id="ia-separador"></div>
         <p id="ia-mensaje">Cargando tu resumen del día...</p>
+        <div id="mensaje-motivacional"></div>
     </div>
 
     <!-- Botón + -->
@@ -57,38 +46,19 @@
 
     <!-- Panel formulario -->
     <div id="panel-evento" style="display:none">
-<<<<<<< HEAD
- <h2>Agregar evento ✨</h2>
-
-        <label>Nombre del evento:</label>
-=======
         <h2>✨ Agregar evento</h2>
->>>>>>> f58ff7f96cdbb7ab3cb2b2085f73c053f890acbf
         <input type="text" id="titulo" placeholder="Nombre del evento">
-
         <label>Fecha:</label>
         <input type="date" id="fecha">
-
         <label>Hora:</label>
         <input type="time" id="hora">
-
         <label>Tipo de evento:</label>
         <select id="tipo">
-<<<<<<< HEAD
-            <option value="Académico">Académico</option>
-            <option value="Personal">Personal</option>
-            <option value="Reunión">Reunión</option>
-            <option value="Otro">Otro</option>
-        </select>
-
-        <button onclick="guardarEvento()">Guardar 💕</button>
-=======
             <option value="tarea">📘 Tarea</option>
             <option value="examen">📕 Examen</option>
             <option value="proyecto">📗 Proyecto</option>
         </select>
-        <button onclick="guardarEvento()">Guardar Evento 💕</button>
->>>>>>> f58ff7f96cdbb7ab3cb2b2085f73c053f890acbf
+        <button onclick="guardarEvento()">Guardar 💕</button>
         <button id="btn-cancelar" onclick="togglePanel()">Cancelar</button>
     </div>
 
@@ -159,6 +129,7 @@
             cal.render();
 
             cargarMensajeIA();
+            mostrarMotivacion();
         });
 
         async function guardarEvento() {
@@ -222,17 +193,20 @@
                 el.textContent = '¡Hola! Soy Lunefia IA. Pronto te avisaré sobre tus próximos eventos 🌟';
             }
         }
-        const mensajes = [
-              "✨ Tú puedes con todo hoy 💖",
-              "🌸 Cada pequeño avance cuenta",
-              "💪 Sigue trabajando, vas increíble",
-              "📚 Un paso más cerca de tus metas",
-              "🌷 Confía en ti y en tu proceso",
-              "⭐ Hoy es un buen día para avanzar",
-              "💕 No te rindas, lo estás haciendo muy bien"
+
+        function mostrarMotivacion() {
+            const mensajes = [
+                "✨ Tú puedes con todo hoy 💖",
+                "🌸 Cada pequeño avance cuenta",
+                "💪 Sigue trabajando, vas increíble",
+                "📚 Un paso más cerca de tus metas",
+                "🌷 Confía en ti y en tu proceso",
+                "⭐ Hoy es un buen día para avanzar",
+                "💕 No te rindas, lo estás haciendo muy bien"
             ];
-            document.getElementById("mensaje-motivacional").textContent = 
-              mensajes[Math.floor(Math.random() * mensajes.length)];
+            document.getElementById("mensaje-motivacional").textContent =
+                mensajes[Math.floor(Math.random() * mensajes.length)];
+        }
     </script>
 
 </body>
