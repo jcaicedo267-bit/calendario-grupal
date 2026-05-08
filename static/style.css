@@ -6,107 +6,361 @@
 }
 
 body {
-    background-color: #f5f0ff;
+    background-color: #0e0820;
+    background-image:
+        radial-gradient(ellipse at 20% 20%, rgba(80, 40, 160, 0.3) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 80%, rgba(45, 27, 105, 0.4) 0%, transparent 50%);
+    min-height: 100vh;
     overflow-x: hidden;
 }
 
+/* ── Encabezado ─────────────────────────────────────────────── */
 #encabezado {
-    background-color: #2d1b69;
-    color: white;
-    padding: 20px 40px;
+    background: linear-gradient(135deg, #1a0d3d 0%, #2d1b69 60%, #3d2480 100%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 18px 40px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+}
+
+#encabezado-contenido {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 #encabezado h1 {
-    font-size: 28px;
+    font-size: 26px;
+    color: #fff;
+    letter-spacing: 0.5px;
 }
 
 #encabezado p {
-    font-size: 14px;
-    opacity: 0.8;
-    margin-top: 4px;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.55);
+    margin-top: 3px;
 }
 
+#encabezado-puntos {
+    display: flex;
+    gap: 7px;
+}
+
+#encabezado-puntos span {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+    display: block;
+}
+
+#encabezado-puntos span:nth-child(1) { background: #ff6b8a; }
+#encabezado-puntos span:nth-child(2) { background: #ffd166; }
+#encabezado-puntos span:nth-child(3) { background: #06d6a0; }
+
+/* ── Contenedor calendario ──────────────────────────────────── */
 #contenedor {
-    padding: 30px 20px;
+    padding: 28px 24px 120px 24px;
 }
 
 #calendario {
-    background: white;
-    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
     padding: 20px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(10px);
 }
 
+/* FullCalendar colores oscuros */
 .fc {
     max-width: 100%;
+    color: rgba(255, 255, 255, 0.85);
 }
 
+.fc-toolbar-title {
+    color: #fff !important;
+    font-size: 18px !important;
+}
+
+.fc-button {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    color: rgba(255, 255, 255, 0.8) !important;
+    font-family: 'Sour Gummy', sans-serif !important;
+    border-radius: 8px !important;
+    transition: background 0.2s !important;
+}
+
+.fc-button:hover {
+    background: rgba(255, 255, 255, 0.15) !important;
+}
+
+.fc-button-active, .fc-button-primary:not(:disabled).fc-button-active {
+    background: #5b3fd4 !important;
+    border-color: #7c5ce8 !important;
+}
+
+.fc-today-button {
+    background: rgba(91, 63, 212, 0.4) !important;
+}
+
+.fc-daygrid-day-number,
+.fc-col-header-cell-cushion {
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.fc-day-today {
+    background: rgba(91, 63, 212, 0.2) !important;
+}
+
+.fc-daygrid-day:hover {
+    background: rgba(255, 255, 255, 0.04) !important;
+}
+
+.fc-scrollgrid,
+.fc-scrollgrid-sync-table,
+.fc-col-header {
+    border-color: rgba(255, 255, 255, 0.07) !important;
+}
+
+.fc td, .fc th {
+    border-color: rgba(255, 255, 255, 0.07) !important;
+}
+
+.fc-now-indicator-line {
+    border-color: #ff6b8a !important;
+    border-width: 2px !important;
+}
+
+/* ── Botón + ────────────────────────────────────────────────── */
 #btn-agregar {
     position: fixed;
     bottom: 30px;
     right: 30px;
-    width: 55px;
-    height: 55px;
-    background-color: #2d1b69;
+    width: 52px;
+    height: 52px;
+    background: linear-gradient(135deg, #5b3fd4, #7c5ce8);
     color: white;
     border: none;
     border-radius: 50%;
-    font-size: 30px;
+    font-size: 28px;
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    box-shadow:
+        0 4px 20px rgba(91, 63, 212, 0.5),
+        0 0 0 0 rgba(91, 63, 212, 0.4);
     z-index: 1000;
+    transition: transform 0.2s, box-shadow 0.2s;
+    animation: pulso 2.5s infinite;
 }
 
 #btn-agregar:hover {
-    background-color: #3d2b89;
+    transform: scale(1.1);
+    box-shadow: 0 6px 28px rgba(91, 63, 212, 0.7);
+    animation: none;
 }
 
+@keyframes pulso {
+    0%, 100% { box-shadow: 0 4px 20px rgba(91, 63, 212, 0.5), 0 0 0 0 rgba(91, 63, 212, 0.4); }
+    50%       { box-shadow: 0 4px 20px rgba(91, 63, 212, 0.5), 0 0 0 10px rgba(91, 63, 212, 0); }
+}
+
+/* ── Panel formulario ───────────────────────────────────────── */
 #panel-evento {
     position: fixed;
-    bottom: 100px;
+    bottom: 92px;
     right: 30px;
-    background: white;
-    border-radius: 12px;
+    background: rgba(22, 12, 55, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 16px;
     padding: 20px;
-    width: 280px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    width: 270px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
     z-index: 1000;
+    backdrop-filter: blur(16px);
+    animation: slideUp 0.2s ease;
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
 }
 
 #panel-evento h2 {
-    font-size: 16px;
-    color: #2d1b69;
-    margin-bottom: 16px;
+    font-size: 15px;
+    color: #fff;
+    margin-bottom: 14px;
 }
 
 #panel-evento input,
 #panel-evento select {
     width: 100%;
-    padding: 10px;
-    margin-bottom: 12px;
-    border: 1px solid #ddd;
+    padding: 9px 12px;
+    margin-bottom: 10px;
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 8px;
-    font-size: 14px;
+    font-size: 13px;
     font-family: 'Sour Gummy', sans-serif;
+    color: rgba(255, 255, 255, 0.85);
+    transition: border-color 0.2s;
+}
+
+#panel-evento input:focus,
+#panel-evento select:focus {
+    outline: none;
+    border-color: rgba(124, 92, 232, 0.7);
+}
+
+#panel-evento input::placeholder { color: rgba(255,255,255,0.3); }
+
+#panel-evento select option {
+    background: #1a0d3d;
 }
 
 #panel-evento button {
     width: 100%;
     padding: 10px;
-    background-color: #2d1b69;
+    background: linear-gradient(135deg, #5b3fd4, #7c5ce8);
     color: white;
     border: none;
     border-radius: 8px;
-    font-size: 14px;
+    font-size: 13px;
     font-family: 'Sour Gummy', sans-serif;
     cursor: pointer;
-    margin-bottom: 8px;
+    margin-bottom: 7px;
+    transition: opacity 0.2s;
 }
+
+#panel-evento button:hover { opacity: 0.88; }
 
 #btn-cancelar {
-    background-color: #aaa !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
 
-.oculto {
-    display: none !important;
+/* ── Panel IA ───────────────────────────────────────────────── */
+#panel-ia {
+    position: fixed;
+    bottom: 92px;
+    right: 30px;   /* justo a la izquierda del botón + */
+    width: 240px;
+    background: rgba(22, 12, 55, 0.92);
+    border: 1px solid rgba(124, 92, 232, 0.35);
+    border-radius: 16px;
+    padding: 14px 16px;
+    z-index: 999;
+    backdrop-filter: blur(16px);
+    box-shadow:
+        0 6px 24px rgba(0, 0, 0, 0.4),
+        0 0 20px rgba(91, 63, 212, 0.15);
+    animation: fadeIn 0.6s ease;
 }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+#panel-ia-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+#ia-icono {
+    font-size: 22px;
+    line-height: 1;
+    filter: drop-shadow(0 0 6px rgba(180, 140, 255, 0.6));
+}
+
+#ia-nombre {
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.2;
+}
+
+#ia-estado {
+    font-size: 10px;
+    color: #06d6a0;
+    letter-spacing: 0.3px;
+}
+
+#ia-separador {
+    height: 1px;
+    background: linear-gradient(90deg, rgba(124, 92, 232, 0.5), transparent);
+    margin-bottom: 10px;
+}
+
+#ia-mensaje {
+    font-size: 12.5px;
+    color: rgba(255, 255, 255, 0.75);
+    line-height: 1.55;
+}
+/* ── Modal borrar ───────────────────────────────────────────── */
+#modal-borrar {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    backdrop-filter: blur(4px);
+    animation: fadeIn 0.15s ease;
+}
+
+#modal-caja {
+    background: rgba(22, 12, 55, 0.97);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 16px;
+    padding: 24px 28px;
+    width: 280px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+    text-align: center;
+}
+
+#modal-texto {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 15px;
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+#modal-botones {
+    display: flex;
+    gap: 10px;
+}
+
+#modal-confirmar {
+    flex: 1;
+    padding: 10px;
+    background: linear-gradient(135deg, #c0392b, #e74c3c);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: 'Sour Gummy', sans-serif;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+#modal-confirmar:hover { opacity: 0.85; }
+
+#modal-cancelar {
+    flex: 1;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.7);
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: 'Sour Gummy', sans-serif;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+#modal-cancelar:hover { background: rgba(255,255,255,0.14); }

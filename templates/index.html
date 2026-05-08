@@ -12,20 +12,58 @@
 <body>
 
     <div id="encabezado">
-        <h1>🌙 Lunefia</h1>
-        <p>Tu calendario grupal inteligente</p>
+        <div id="encabezado-contenido">
+            <div>
+                <h1>🌙 Lunefia</h1>
+                <p>Tu calendario grupal inteligente</p>
+            </div>
+            <div id="encabezado-puntos">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
     </div>
 
     <div id="contenedor">
         <div id="calendario"></div>
     </div>
+<!-- Mensaje motivacional -->
+<div id="mensaje-motivacional" style="
+  background: #FFF0F5;
+  border-radius: 12px;
+  padding: 15px 20px;
+  margin: 15px 0;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+  color: #c0306a;
+  box-shadow: 0 2px 8px rgba(255,105,180,0.15);
+">
+</div>
+    <!-- Recuadro IA -->
+    <div id="panel-ia">
+        <div id="panel-ia-header">
+            <span id="ia-icono">🌙</span>
+            <div>
+                <p id="ia-nombre">Lunefia IA</p>
+                <span id="ia-estado">● activa</span>
+            </div>
+        </div>
+        <div id="ia-separador"></div>
+        <p id="ia-mensaje">Cargando tu resumen del día...</p>
+    </div>
 
+    <!-- Botón + -->
     <button id="btn-agregar" onclick="togglePanel()">+</button>
 
+    <!-- Panel formulario -->
     <div id="panel-evento" style="display:none">
+<<<<<<< HEAD
  <h2>Agregar evento ✨</h2>
 
         <label>Nombre del evento:</label>
+=======
+        <h2>✨ Agregar evento</h2>
+>>>>>>> f58ff7f96cdbb7ab3cb2b2085f73c053f890acbf
         <input type="text" id="titulo" placeholder="Nombre del evento">
 
         <label>Fecha:</label>
@@ -36,6 +74,7 @@
 
         <label>Tipo de evento:</label>
         <select id="tipo">
+<<<<<<< HEAD
             <option value="Académico">Académico</option>
             <option value="Personal">Personal</option>
             <option value="Reunión">Reunión</option>
@@ -43,18 +82,36 @@
         </select>
 
         <button onclick="guardarEvento()">Guardar 💕</button>
+=======
+            <option value="tarea">📘 Tarea</option>
+            <option value="examen">📕 Examen</option>
+            <option value="proyecto">📗 Proyecto</option>
+        </select>
+        <button onclick="guardarEvento()">Guardar Evento 💕</button>
+>>>>>>> f58ff7f96cdbb7ab3cb2b2085f73c053f890acbf
         <button id="btn-cancelar" onclick="togglePanel()">Cancelar</button>
+    </div>
+
+    <!-- Modal borrar evento -->
+    <div id="modal-borrar" style="display:none">
+        <div id="modal-caja">
+            <p id="modal-texto">¿Borrar este evento?</p>
+            <div id="modal-botones">
+                <button id="modal-confirmar">🗑 Borrar</button>
+                <button id="modal-cancelar" onclick="cerrarModal()">Cancelar</button>
+            </div>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
     <script>
         function togglePanel() {
             const panel = document.getElementById('panel-evento');
-            if (panel.style.display === 'none') {
-                panel.style.display = 'block';
-            } else {
-                panel.style.display = 'none';
-            }
+            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function cerrarModal() {
+            document.getElementById('modal-borrar').style.display = 'none';
         }
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -73,7 +130,7 @@
                     successCallback(eventos);
                 },
                 eventDidMount: function(info) {
-                    const tipo = info.event.extendedProps.tipo || info.event._def.extendedProps.tipo;
+                    const tipo = info.event.extendedProps.tipo;
                     if (tipo === 'tarea') {
                         info.el.style.backgroundColor = '#4A90D9';
                         info.el.style.borderColor = '#2C6FAC';
@@ -86,16 +143,22 @@
                     }
                 },
                 eventClick: function(info) {
-                    if (confirm('¿Quieres borrar el evento "' + info.event.title + '"?')) {
+                    const modal = document.getElementById('modal-borrar');
+                    document.getElementById('modal-texto').textContent = '¿Borrar "' + info.event.title + '"?';
+                    modal.style.display = 'flex';
+
+                    document.getElementById('modal-confirmar').onclick = function() {
                         fetch('/api/eventos/borrar', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ titulo: info.event.title })
                         }).then(() => location.reload());
-                    }
+                    };
                 },
             });
             cal.render();
+
+            cargarMensajeIA();
         });
 
         async function guardarEvento() {
@@ -109,9 +172,55 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ title: titulo, start: fecha + 'T' + hora, tipo: tipo })
             });
-            
+
             togglePanel();
             location.reload();
+        }
+
+        async function cargarMensajeIA() {
+            const el = document.getElementById('ia-mensaje');
+            try {
+                const res = await fetch('/api/eventos');
+                const eventos = await res.json();
+
+                const hoy = new Date();
+                const en3dias = new Date();
+                en3dias.setDate(hoy.getDate() + 3);
+
+                const proximos = eventos.filter(ev => {
+                    const fecha = new Date(ev.start);
+                    return fecha >= hoy && fecha <= en3dias;
+                });
+
+                if (proximos.length === 0) {
+                    el.textContent = '¡Todo tranquilo por ahora! No tienes eventos en los próximos 3 días 🌙';
+                    return;
+                }
+
+                proximos.sort((a, b) => new Date(a.start) - new Date(b.start));
+
+                const siguiente = proximos[0];
+                const fecha = new Date(siguiente.start);
+                const diasRestantes = Math.ceil((fecha - hoy) / (1000 * 60 * 60 * 24));
+
+                const emojis = { tarea: '📘', examen: '📕', proyecto: '📗' };
+                const emoji = emojis[siguiente.tipo] || '📅';
+
+                if (diasRestantes === 0) {
+                    el.textContent = `${emoji} ¡Hoy tienes "${siguiente.title}"! Mucho ánimo 💪`;
+                } else if (diasRestantes === 1) {
+                    el.textContent = `${emoji} Mañana tienes "${siguiente.title}". ¡Ya casi!`;
+                } else {
+                    el.textContent = `${emoji} En ${diasRestantes} días: "${siguiente.title}". ¡Prepárate con tiempo!`;
+                }
+
+                if (proximos.length > 1) {
+                    el.textContent += ` (+${proximos.length - 1} más esta semana)`;
+                }
+
+            } catch {
+                el.textContent = '¡Hola! Soy Lunefia IA. Pronto te avisaré sobre tus próximos eventos 🌟';
+            }
         }
     </script>
 
