@@ -222,6 +222,17 @@
                 el.textContent = '¡Hola! Soy Lunefia IA. Pronto te avisaré sobre tus próximos eventos 🌟';
             }
         }
+        const mensajes = [
+              "✨ Tú puedes con todo hoy 💖",
+              "🌸 Cada pequeño avance cuenta",
+              "💪 Sigue trabajando, vas increíble",
+              "📚 Un paso más cerca de tus metas",
+              "🌷 Confía en ti y en tu proceso",
+              "⭐ Hoy es un buen día para avanzar",
+              "💕 No te rindas, lo estás haciendo muy bien"
+            ];
+            document.getElementById("mensaje-motivacional").textContent = 
+              mensajes[Math.floor(Math.random() * mensajes.length)];
     </script>
 
 </body>
