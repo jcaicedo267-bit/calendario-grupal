@@ -48,5 +48,10 @@
         "title": "comer monda",
         "start": "2026-05-07T10:37",
         "tipo": "tarea"
+    },
+    {
+        "title": "papoi",
+        "start": "2026-05-11T20:52",
+        "tipo": "proyecto"
     }
 ]
