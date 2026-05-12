@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Lunefia — Entrar</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sour+Gummy:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+</head>
+<body class="auth-body">
+
+    <div class="auth-estrellas" aria-hidden="true">
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span>
+    </div>
+
+    <div class="auth-card">
+
+        <div class="auth-logo">
+            <span class="auth-luna">🌙</span>
+            <h1>Lunefia</h1>
+            <p>Tu calendario grupal inteligente</p>
+        </div>
+
+        {% if error %}
+        <div class="auth-error">{{ error }}</div>
+        {% endif %}
+
+        <form method="POST" action="/login">
+            <div class="auth-campo">
+                <label for="correo">Correo</label>
+                <input type="email" id="correo" name="correo" placeholder="tu@correo.com" required>
+            </div>
+            <div class="auth-campo">
+                <label for="contrasena">Contraseña</label>
+                <input type="password" id="contrasena" name="contrasena" placeholder="••••••••" required>
+            </div>
+            <button type="submit" class="auth-btn">Entrar a Lunefia</button>
+        </form>
+
+        <p class="auth-link">¿No tienes cuenta? <a href="/registro">Regístrate aquí</a></p>
+
+    </div>
+
+</body>
+</html>

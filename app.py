@@ -49,7 +49,7 @@ def obtener_mensaje_ia(eventos):
 
 @app.route("/")
 def inicio():
-    return render_template("index.html")
+    return render_template("principal.html")
 
 @app.route("/api/ia/resumen")
 def resumen_ia():

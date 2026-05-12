@@ -370,3 +370,187 @@ body {
     margin-top: 8px;
     line-height: 1.55;
 }
+
+/* ────────────────────────────────────────────────────────────
+   LAYOUT PRINCIPAL (principal.html)
+──────────────────────────────────────────────────────────── */
+
+#saludo-usuario {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.btn-logout {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.45);
+    text-decoration: none;
+    padding: 5px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
+    font-family: 'Sour Gummy', sans-serif;
+    transition: background 0.2s;
+}
+
+.btn-logout:hover { background: rgba(255,255,255,0.07); color: white; }
+
+#layout-principal {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: 20px;
+    padding: 24px 24px 120px 24px;
+    align-items: start;
+}
+
+/* ── Columna calendario ────────────────────────────────────── */
+#columna-calendario #calendario {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06);
+    backdrop-filter: blur(10px);
+}
+
+/* ── Columna lateral ───────────────────────────────────────── */
+#columna-lateral {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.lateral-seccion {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+}
+
+.lateral-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.lateral-header span { font-size: 18px; flex-shrink: 0; }
+
+.lateral-header h2 {
+    font-size: 14px;
+    color: #fff;
+    margin: 0;
+    flex: 1;
+}
+
+.btn-lateral {
+    padding: 5px 12px;
+    background: linear-gradient(135deg, #5b3fd4, #7c5ce8);
+    color: white;
+    border: none;
+    border-radius: 7px;
+    font-size: 11px;
+    font-family: 'Sour Gummy', sans-serif;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    flex-shrink: 0;
+}
+
+.btn-lateral:hover { opacity: 0.85; }
+
+/* Notas */
+#notas-texto {
+    width: 100%;
+    min-height: 160px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    padding: 10px 12px;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 12.5px;
+    font-family: 'Sour Gummy', sans-serif;
+    resize: vertical;
+    line-height: 1.6;
+    transition: border-color 0.2s;
+}
+
+#notas-texto:focus {
+    outline: none;
+    border-color: rgba(124, 92, 232, 0.5);
+}
+
+#notas-texto::placeholder { color: rgba(255,255,255,0.2); }
+
+/* Crear calendarios */
+.crear-opciones {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+
+.crear-card {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    padding: 12px 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s, transform 0.15s;
+    font-family: 'Sour Gummy', sans-serif;
+    color: white;
+}
+
+.crear-card:hover {
+    background: rgba(91, 63, 212, 0.15);
+    border-color: rgba(124, 92, 232, 0.4);
+    transform: translateY(-2px);
+}
+
+.crear-card > span { font-size: 20px; display: block; margin-bottom: 4px; }
+.crear-card strong { font-size: 12px; display: block; margin-bottom: 2px; }
+.crear-card p { font-size: 10px; color: rgba(255,255,255,0.35); margin: 0; }
+
+.lista-titulo {
+    font-size: 10px;
+    color: rgba(255,255,255,0.3);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 8px;
+}
+
+.lista-vacia {
+    font-size: 11px;
+    color: rgba(255,255,255,0.2);
+    text-align: center;
+    padding: 8px 0;
+}
+
+.calendario-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s;
+    margin-bottom: 4px;
+}
+
+.calendario-item:hover { background: rgba(255,255,255,0.06); }
+.calendario-item > span { font-size: 16px; }
+.calendario-item strong { display: block; font-size: 12px; color: #fff; }
+.calendario-item small { font-size: 10px; color: rgba(255,255,255,0.3); text-transform: capitalize; }
+
+/* Responsive */
+@media (max-width: 860px) {
+    #layout-principal {
+        grid-template-columns: 1fr;
+    }
+    #columna-lateral {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+    .lateral-seccion { flex: 1; min-width: 240px; }
+}
