@@ -1,25 +1,5 @@
 [
     {
-        "title": "tarea",
-        "start": "2026-05-12",
-        "tipo": "tarea"
-    },
-    {
-        "title": "haajdshsaj",
-        "start": "2026-05-21",
-        "tipo": "examen"
-    },
-    {
-        "title": "jhcjcjcjchvj",
-        "start": "2026-05-12",
-        "tipo": "proyecto"
-    },
-    {
-        "title": "ejfijh",
-        "start": "2026-05-14",
-        "tipo": "examen"
-    },
-    {
         "title": "",
         "start": "",
         "tipo": "tarea"
@@ -33,25 +13,5 @@
         "title": "",
         "start": "",
         "tipo": "tarea"
-    },
-    {
-        "title": "asdafdafa",
-        "start": "2026-05-31",
-        "tipo": "proyecto"
-    },
-    {
-        "title": "sbdjjaibsda",
-        "start": "2026-05-06",
-        "tipo": "proyecto"
-    },
-    {
-        "title": "comer monda",
-        "start": "2026-05-07T10:37",
-        "tipo": "tarea"
-    },
-    {
-        "title": "papoi",
-        "start": "2026-05-11T20:52",
-        "tipo": "proyecto"
     }
 ]
