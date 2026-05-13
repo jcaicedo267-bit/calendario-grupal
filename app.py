@@ -12,8 +12,11 @@ CALENDARIOS_FILE = 'calendarios.json'
 
 def cargar_json(archivo):
     if os.path.exists(archivo):
-        with open(archivo, 'r', encoding='utf-8') as f:
-            return json.load(f)
+        try:
+            with open(archivo, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except:
+            return [] if "notas" not in archivo else {"texto": ""}
     return [] if "notas" not in archivo else {"texto": ""}
 
 def guardar_json(archivo, datos):
@@ -28,7 +31,8 @@ def proteger_rutas():
 
 @app.route("/")
 def inicio():
-    return render_template("index.html")
+    # CAMBIO IMPORTANTE: Usamos principal.html porque es el que tienes en tu carpeta
+    return render_template("principal.html")
 
 @app.route("/registro", methods=['GET', 'POST'])
 def registro():
@@ -51,7 +55,7 @@ def login():
             if u['user'] == user and u['pass'] == pw:
                 session['usuario'] = user
                 return redirect(url_for('inicio'))
-        return "Error", 401
+        return "Error: Datos incorrectos", 401
     return render_template('login.html')
 
 @app.route("/logout")
