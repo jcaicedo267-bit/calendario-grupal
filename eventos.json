@@ -13,5 +13,12 @@
         "title": "",
         "start": "",
         "tipo": "tarea"
+    },
+    {
+        "title": "jugar fri fair",
+        "start": "2026-05-14T14:41",
+        "tipo": "tarea",
+        "materia": "",
+        "calendario": ""
     }
 ]
