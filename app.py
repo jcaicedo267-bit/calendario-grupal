@@ -89,7 +89,7 @@ def registro():
         usuario = request.form.get("usuario")
         contraseña = request.form.get("contraseña")
         if not usuario or not contraseña:
-            return render_template("registro.html", error="Completa todos los campos 💔")
+            return render_template("registrogit pull origin main.html", error="Completa todos los campos 💔")
         usuarios = cargar_usuarios()
         usuarios[usuario] = contraseña
         guardar_usuarios(usuarios)
