@@ -30,11 +30,22 @@ def proteger_rutas():
 def inicio():
     return render_template("index.html")
 
+@app.route("/registro", methods=['GET', 'POST'])
+def registro():
+    if request.method == 'POST':
+        user = request.form.get('correo')
+        pw = request.form.get('contrasena')
+        usuarios = cargar_json(USUARIOS_FILE)
+        usuarios.append({"user": user, "pass": pw})
+        guardar_json(USUARIOS_FILE, usuarios)
+        return redirect(url_for('login'))
+    return render_template('registro.html')
+
 @app.route("/login", methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        user = request.form.get('username')
-        pw = request.form.get('password')
+        user = request.form.get('correo')
+        pw = request.form.get('contrasena')
         usuarios = cargar_json(USUARIOS_FILE)
         for u in usuarios:
             if u['user'] == user and u['pass'] == pw:
