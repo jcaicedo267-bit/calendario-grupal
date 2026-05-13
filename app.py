@@ -14,8 +14,14 @@ ARCHIVO_CALENDARIOS = 'calendarios.json'
 # -------- HELPERS --------
 def cargar_json(archivo, default):
     if os.path.exists(archivo):
-        with open(archivo, 'r') as f:
-            return json.load(f)
+        try:
+            with open(archivo, 'r') as f:
+                contenido = f.read().strip()
+                if not contenido:
+                    return default
+                return json.loads(contenido)
+        except json.JSONDecodeError:
+            return default
     return default
 
 def guardar_json(archivo, datos):
