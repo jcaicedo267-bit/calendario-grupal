@@ -28,7 +28,7 @@ def proteger_rutas():
 
 @app.route("/")
 def inicio():
-    return render_template("index.html")
+    return render_template("formato_calendario.html")
 
 @app.route("/registro", methods=['GET', 'POST'])
 def registro():
