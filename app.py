@@ -18,7 +18,7 @@ def guardar_datos(datos):
 
 @app.route("/")
 def inicio():
-    return render_template("principal.html")
+    return render_template("home.html")
 
 @app.route("/api/eventos", methods=["GET", "POST"])
 def manejar_eventos():
@@ -79,7 +79,7 @@ def login():
         contraseña = request.form.get("contraseña")
         usuarios = cargar_usuarios()
         if usuario in usuarios and usuarios[usuario] == contraseña:
-            return render_template("principal.html", usuario=usuario)
+            return render_template("home.html", usuario=usuario)
         return render_template("login.html", error="Usuario o contraseña incorrectos 💔")
     return render_template("login.html")
 
@@ -89,11 +89,11 @@ def registro():
         usuario = request.form.get("usuario")
         contraseña = request.form.get("contraseña")
         if not usuario or not contraseña:
-            return render_template("registro.html", error="Completa todos los campos 💔")
+            return render_template("registrogit pull origin main.html", error="Completa todos los campos 💔")
         usuarios = cargar_usuarios()
         usuarios[usuario] = contraseña
         guardar_usuarios(usuarios)
-        return render_template("principal.html", usuario=usuario)
+        return render_template("home.html", usuario=usuario)
     return render_template("registro.html")
 
 @app.route("/logout")

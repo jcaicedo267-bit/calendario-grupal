@@ -2,46 +2,31 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Lunefia — Entrar</title>
-    <link rel="stylesheet" href="/static/style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Sour+Gummy:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <title>Login</title>
+    <style>
+        body { background-color: #FFF0F5; font-family: Arial, sans-serif; display: flex; justify-content: center; padding: 60px; }
+        .caja { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 2px 10px rgba(255,182,193,0.4); width: 320px; text-align: center; }
+        h2 { color: #d63384; }
+        input { width: 100%; padding: 8px; margin: 8px 0; border: 1px solid #FFB6C1; border-radius: 6px; box-sizing: border-box; }
+        .btn-login { background: #FFB6C1; border: none; padding: 10px; width: 100%; border-radius: 8px; font-size: 15px; cursor: pointer; margin-top: 10px; }
+        .btn-registro { background: #E6CCFF; border: none; padding: 10px; width: 100%; border-radius: 8px; font-size: 15px; cursor: pointer; margin-top: 8px; }
+        .btn-login:hover { background: #ff8fa3; }
+        .btn-registro:hover { background: #d4aaff; }
+        .error { color: red; margin-top: 10px; }
+    </style>
 </head>
-<body class="auth-body">
-
-    <div class="auth-estrellas" aria-hidden="true">
-        <span></span><span></span><span></span><span></span><span></span>
-        <span></span><span></span><span></span><span></span><span></span>
-    </div>
-
-    <div class="auth-card">
-
-        <div class="auth-logo">
-            <span class="auth-luna">🌙</span>
-            <h1>Lunefia</h1>
-            <p>Tu calendario grupal inteligente</p>
-        </div>
-
-        {% if error %}
-        <div class="auth-error">{{ error }}</div>
-        {% endif %}
-
-        <form method="POST" action="/login">
-            <div class="auth-campo">
-                <label for="correo">Correo</label>
-                <input type="email" id="correo" name="correo" placeholder="tu@correo.com" required>
-            </div>
-            <div class="auth-campo">
-                <label for="contrasena">Contraseña</label>
-                <input type="password" id="contrasena" name="contrasena" placeholder="••••••••" required>
-            </div>
-            <button type="submit" class="auth-btn">Entrar a Lunefia</button>
-        </form>
-
-        <p class="auth-link">¿No tienes cuenta? <a href="/registro">Regístrate aquí</a></p>
-
-    </div>
-
+<body>
+<div class="caja">
+    <h2>🌸 Calendario 🌸</h2>
+    {% if error %}<p class="error">{{ error }}</p>{% endif %}
+    <form method="POST" action="/login">
+        <input type="text" name="usuario" placeholder="Usuario">
+        <input type="password" name="contraseña" placeholder="Contraseña">
+        <button class="btn-login" type="submit">Iniciar Sesión 💖</button>
+    </form>
+    <form method="GET" action="/registro">
+        <button class="btn-registro" type="submit">Registrarse ✨</button>
+    </form>
+</div>
 </body>
 </html>
