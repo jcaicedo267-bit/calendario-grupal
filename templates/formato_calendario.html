@@ -69,37 +69,34 @@
         }
         #notas-texto:focus { outline: none; border-color: rgba(124,92,232,0.5); }
         #notas-texto::placeholder { color: rgba(255,255,255,0.2); }
-        .crear-opciones {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            margin-bottom: 14px;
-        }
-        .crear-card {
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 10px;
-            padding: 12px 8px;
-            text-align: center;
-            cursor: pointer;
-            font-family: 'Sour Gummy', sans-serif;
-            color: white;
-            transition: background 0.2s, transform 0.15s;
-        }
-        .crear-card:hover { background: rgba(91,63,212,0.2); transform: translateY(-2px); }
-        .crear-card > span { font-size: 20px; display: block; margin-bottom: 4px; }
-        .crear-card strong { font-size: 12px; display: block; margin-bottom: 2px; }
-        .crear-card p { font-size: 10px; color: rgba(255,255,255,0.35); margin: 0; }
         .lista-titulo { font-size: 10px; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; }
-        .lista-vacia { font-size: 11px; color: rgba(255,255,255,0.2); text-align: center; padding: 8px 0; }
-        .calendario-item { display: flex; align-items: center; gap: 8px; padding: 8px; border-radius: 8px; cursor: pointer; margin-bottom: 4px; }
-        .calendario-item:hover { background: rgba(255,255,255,0.06); }
-        .calendario-item > span { font-size: 16px; }
-        .calendario-item strong { display: block; font-size: 12px; color: #fff; }
-        .calendario-item small { font-size: 10px; color: rgba(255,255,255,0.3); text-transform: capitalize; }
         #saludo-usuario { font-size: 13px; color: rgba(255,255,255,0.6); }
         .btn-logout { font-size: 12px; color: rgba(255,255,255,0.45); text-decoration: none; padding: 5px 12px; border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; font-family: 'Sour Gummy', sans-serif; }
         .btn-logout:hover { background: rgba(255,255,255,0.07); color: white; }
+
+        /* Botón volver al inicio */
+        .btn-home {
+            font-size: 12px;
+            color: rgba(255,255,255,0.5);
+            text-decoration: none;
+            padding: 5px 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            font-family: 'Sour Gummy', sans-serif;
+            transition: background 0.2s, color 0.2s;
+        }
+        .btn-home:hover { background: rgba(255,255,255,0.07); color: white; }
+
+        /* Nombre del calendario activo */
+        #nombre-calendario {
+            font-size: 13px;
+            color: rgba(255,255,255,0.5);
+            padding: 4px 10px;
+            background: rgba(255,255,255,0.04);
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
         @media (max-width: 860px) {
             #layout-principal { grid-template-columns: 1fr; }
         }
@@ -109,12 +106,13 @@
 
     <div id="encabezado">
         <div id="encabezado-contenido">
-            <div>
+            <div style="display:flex;align-items:center;gap:12px">
                 <h1>🌙 Lunefia</h1>
-                <p>Tu calendario grupal inteligente</p>
+                <span id="nombre-calendario">Cargando...</span>
             </div>
-            <div style="display:flex;align-items:center;gap:16px">
+            <div style="display:flex;align-items:center;gap:12px">
                 <span id="saludo-usuario">Hola, Onixe 👋</span>
+                <a href="/" class="btn-home">← Mis calendarios</a>
                 <a href="/logout" class="btn-logout">Salir</a>
                 <div id="encabezado-puntos">
                     <span></span><span></span><span></span>
@@ -125,10 +123,12 @@
 
     <div id="layout-principal">
 
+        <!-- Calendario -->
         <div id="columna-calendario">
             <div id="calendario"></div>
         </div>
 
+        <!-- Columna lateral: solo notas + IA -->
         <div id="columna-lateral">
 
             <section class="lateral-seccion" id="seccion-notas">
@@ -140,32 +140,10 @@
                 <textarea id="notas-texto" placeholder="Escribe tus notas aquí... Solo tú las ves 🌙"></textarea>
             </section>
 
-            <section class="lateral-seccion" id="seccion-crear">
-                <div class="lateral-header">
-                    <span>✨</span>
-                    <h2>Calendarios</h2>
-                </div>
-                <div class="crear-opciones">
-                    <button class="crear-card" onclick="crearCalendario('personal')">
-                        <span>🗓</span>
-                        <strong>Personal</strong>
-                        <p>Solo para ti</p>
-                    </button>
-                    <button class="crear-card" onclick="crearCalendario('grupal')">
-                        <span>👥</span>
-                        <strong>Grupal</strong>
-                        <p>Con tu equipo</p>
-                    </button>
-                </div>
-                <p class="lista-titulo">Tus calendarios</p>
-                <div id="calendarios-items">
-                    <p class="lista-vacia">Todavía no tienes calendarios 🌙</p>
-                </div>
-            </section>
-
         </div>
     </div>
 
+    <!-- IA panel -->
     <div id="panel-ia">
         <div id="panel-ia-header">
             <span id="ia-icono">🌙</span>
@@ -179,8 +157,10 @@
         <div id="mensaje-motivacional"></div>
     </div>
 
+    <!-- Botón agregar evento -->
     <button id="btn-agregar" onclick="togglePanel()">+</button>
 
+    <!-- Panel nuevo evento -->
     <div id="panel-evento" style="display:none">
         <h2>✨ Agregar evento</h2>
         <input type="text" id="titulo" placeholder="Nombre del evento">
@@ -200,6 +180,7 @@
         <button id="btn-cancelar" onclick="togglePanel()">Cancelar</button>
     </div>
 
+    <!-- Modal borrar -->
     <div id="modal-borrar" style="display:none">
         <div id="modal-caja">
             <p id="modal-texto">¿Borrar este evento?</p>
@@ -212,7 +193,22 @@
 
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        // Obtener el ID del calendario de la URL: /calendario/<id>
+        const calId = window.location.pathname.split('/').pop();
+
+        document.addEventListener('DOMContentLoaded', async function() {
+
+            // Cargar nombre del calendario
+            try {
+                const res = await fetch('/api/calendarios');
+                const lista = await res.json();
+                const actual = lista.find(c => String(c.id) === String(calId));
+                if (actual) {
+                    document.getElementById('nombre-calendario').textContent =
+                        (actual.tipo === 'grupal' ? '👥 ' : '🗓 ') + actual.nombre;
+                }
+            } catch {}
+
             var cal = new FullCalendar.Calendar(document.getElementById('calendario'), {
                 initialView: 'dayGridMonth',
                 locale: 'es',
@@ -223,15 +219,15 @@
                     right: 'dayGridMonth,timeGridWeek,timeGridDay'
                 },
                 events: async function(info, successCallback) {
-                    const res = await fetch('/api/eventos');
+                    const res = await fetch(`/api/eventos?calendario=${calId}`);
                     const eventos = await res.json();
                     successCallback(eventos);
                 },
                 eventDidMount: function(info) {
                     const tipo = info.event.extendedProps.tipo;
-                    if (tipo === 'tarea')     { info.el.style.backgroundColor = '#4A90D9'; info.el.style.borderColor = '#2C6FAC'; }
-                    else if (tipo === 'examen')    { info.el.style.backgroundColor = '#E74C3C'; info.el.style.borderColor = '#B03A2E'; }
-                    else if (tipo === 'proyecto')  { info.el.style.backgroundColor = '#27AE60'; info.el.style.borderColor = '#1E8449'; }
+                    if (tipo === 'tarea')    { info.el.style.backgroundColor = '#4A90D9'; info.el.style.borderColor = '#2C6FAC'; }
+                    else if (tipo === 'examen')   { info.el.style.backgroundColor = '#E74C3C'; info.el.style.borderColor = '#B03A2E'; }
+                    else if (tipo === 'proyecto') { info.el.style.backgroundColor = '#27AE60'; info.el.style.borderColor = '#1E8449'; }
                 },
                 eventClick: function(info) {
                     const modal = document.getElementById('modal-borrar');
@@ -241,7 +237,7 @@
                         fetch('/api/eventos/borrar', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ titulo: info.event.title })
+                            body: JSON.stringify({ titulo: info.event.title, calendario: calId })
                         }).then(() => location.reload());
                     };
                 },
@@ -250,7 +246,6 @@
             cargarMensajeIA();
             mostrarMotivacion();
             cargarNotas();
-            cargarCalendarios();
         });
 
         function togglePanel() {
@@ -271,7 +266,7 @@
             await fetch('/api/eventos', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ title: titulo, start: fecha + 'T' + hora, tipo, materia })
+                body: JSON.stringify({ title: titulo, start: fecha + 'T' + hora, tipo, materia, calendario: calId })
             });
             togglePanel();
             location.reload();
@@ -280,7 +275,7 @@
         async function cargarMensajeIA() {
             const el = document.getElementById('ia-mensaje');
             try {
-                const res = await fetch('/api/eventos');
+                const res = await fetch(`/api/eventos?calendario=${calId}`);
                 const eventos = await res.json();
                 const hoy = new Date();
                 const en3dias = new Date();
@@ -321,7 +316,7 @@
 
         async function cargarNotas() {
             try {
-                const res = await fetch('/api/notas');
+                const res = await fetch(`/api/notas?calendario=${calId}`);
                 const data = await res.json();
                 document.getElementById('notas-texto').value = data.texto || '';
             } catch {}
@@ -332,38 +327,11 @@
             await fetch('/api/notas', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ texto })
+                body: JSON.stringify({ texto, calendario: calId })
             });
             const btn = document.querySelector('#seccion-notas .btn-lateral');
             btn.textContent = '✓ Guardado';
             setTimeout(() => btn.textContent = 'Guardar', 1500);
-        }
-
-        async function cargarCalendarios() {
-            try {
-                const res = await fetch('/api/calendarios');
-                const lista = await res.json();
-                const contenedor = document.getElementById('calendarios-items');
-                if (lista.length === 0) return;
-                contenedor.innerHTML = '';
-                lista.forEach(c => {
-                    const item = document.createElement('div');
-                    item.className = 'calendario-item';
-                    item.innerHTML = `<span>${c.tipo === 'grupal' ? '👥' : '🗓'}</span>
-                        <div><strong>${c.nombre}</strong><small>${c.tipo}</small></div>`;
-                    contenedor.appendChild(item);
-                });
-            } catch {}
-        }
-
-        function crearCalendario(tipo) {
-            const nombre = prompt(tipo === 'grupal' ? '¿Nombre del calendario grupal?' : '¿Nombre del calendario personal?');
-            if (!nombre) return;
-            fetch('/api/calendarios', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ nombre, tipo })
-            }).then(() => cargarCalendarios());
         }
     </script>
 
