@@ -59,7 +59,86 @@ def crear_evento():
         return render_template("crear_evento.html", exito="Evento creado con éxito ✨")
 
     return render_template("crear_evento.html")
+# -------- USUARIOS --------
+ARCHIVO_USUARIOS = 'usuarios.json'
 
+def cargar_usuarios():
+    if os.path.exists(ARCHIVO_USUARIOS):
+        with open(ARCHIVO_USUARIOS, 'r') as f:
+            return json.load(f)
+    return {}
+
+def guardar_usuarios(usuarios):
+    with open(ARCHIVO_USUARIOS, 'w') as f:
+        json.dump(usuarios, f, indent=4)
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        usuario = request.form.get("usuario")
+        contraseña = request.form.get("contraseña")
+        usuarios = cargar_usuarios()
+        if usuario in usuarios and usuarios[usuario] == contraseña:
+            return render_template("principal.html", usuario=usuario)
+        return render_template("login.html", error="Usuario o contraseña incorrectos 💔")
+    return render_template("login.html")
+
+@app.route("/registro", methods=["GET", "POST"])
+def registro():
+    if request.method == "POST":
+        usuario = request.form.get("usuario")
+        contraseña = request.form.get("contraseña")
+        if not usuario or not contraseña:
+            return render_template("registro.html", error="Completa todos los campos 💔")
+        usuarios = cargar_usuarios()
+        usuarios[usuario] = contraseña
+        guardar_usuarios(usuarios)
+        return render_template("principal.html", usuario=usuario)
+    return render_template("registro.html")
+
+@app.route("/logout")
+def logout():
+    return render_template("login.html")
+
+# -------- NOTAS --------
+ARCHIVO_NOTAS = 'notas.json'
+
+def cargar_notas():
+    if os.path.exists(ARCHIVO_NOTAS):
+        with open(ARCHIVO_NOTAS, 'r') as f:
+            return json.load(f)
+    return []
+
+@app.route("/api/notas", methods=["GET", "POST"])
+def manejar_notas():
+    if request.method == "POST":
+        datos = request.get_json()
+        notas = cargar_notas()
+        notas.append(datos)
+        with open(ARCHIVO_NOTAS, 'w') as f:
+            json.dump(notas, f, indent=4)
+        return jsonify({"mensaje": "Nota guardada ✨"})
+    return jsonify(cargar_notas())
+
+# -------- CALENDARIOS --------
+ARCHIVO_CALENDARIOS = 'calendarios.json'
+
+def cargar_calendarios():
+    if os.path.exists(ARCHIVO_CALENDARIOS):
+        with open(ARCHIVO_CALENDARIOS, 'r') as f:
+            return json.load(f)
+    return []
+
+@app.route("/api/calendarios", methods=["GET", "POST"])
+def manejar_calendarios():
+    if request.method == "POST":
+        datos = request.get_json()
+        calendarios = cargar_calendarios()
+        calendarios.append(datos)
+        with open(ARCHIVO_CALENDARIOS, 'w') as f:
+            json.dump(calendarios, f, indent=4)
+        return jsonify({"mensaje": "Calendario guardado 💖"})
+    return jsonify(cargar_calendarios())
 
 if __name__ == "__main__":
     app.run(debug=True)
