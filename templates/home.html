@@ -2,26 +2,30 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lunefia 🌙 — Inicio</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Sour+Gummy:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <!-- FIX: Enlaza tu CSS externo aquí en vez de duplicar estilos -->
+    <!-- <link rel="stylesheet" href="estilos.css"> -->
     <style>
+        /* ── Reset y variables ── */
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         :root {
-            --bg:        #0e0b1a;
-            --bg2:       #13102299;
-            --bg3:       #1c1730;
-            --purple:    #7c5ce8;
-            --purple2:   #5b3fd4;
-            --purple-soft: rgba(124,92,232,0.15);
-            --border:    rgba(255,255,255,0.08);
-            --text:      #ffffff;
-            --text-dim:  rgba(255,255,255,0.45);
-            --text-faint:rgba(255,255,255,0.2);
-            --radius:    16px;
-            --font:      'Sour Gummy', sans-serif;
+            --bg:           #0e0b1a;
+            --bg2:          rgba(19,16,34,0.6);
+            --bg3:          #1c1730;
+            --purple:       #7c5ce8;
+            --purple2:      #5b3fd4;
+            --purple-soft:  rgba(124,92,232,0.15);
+            --border:       rgba(255,255,255,0.08);
+            --text:         #ffffff;
+            --text-dim:     rgba(255,255,255,0.45);
+            --text-faint:   rgba(255,255,255,0.2);
+            --radius:       16px;
+            --font:         'Sour Gummy', sans-serif;
         }
 
         body {
@@ -32,7 +36,7 @@
             overflow-x: hidden;
         }
 
-        /* Fondo estrellado */
+        /* Fondo con gradientes */
         body::before {
             content: '';
             position: fixed;
@@ -60,6 +64,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            gap: 16px;
         }
         #encabezado h1 {
             font-size: 22px;
@@ -82,7 +87,29 @@
             transition: background 0.2s, color 0.2s;
         }
         .btn-logout:hover { background: rgba(255,255,255,0.07); color: var(--text); }
-        #saludo { font-size: 13px; color: var(--text-dim); }
+
+        #saludo-usuario { font-size: 13px; color: var(--text-dim); }
+
+        /* ── Botón menú hamburguesa ── */
+        #btn-menu {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 8px;
+            padding: 7px 10px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            transition: background 0.2s;
+        }
+        #btn-menu:hover { background: rgba(255,255,255,0.07); }
+        #btn-menu span {
+            display: block;
+            width: 18px;
+            height: 2px;
+            background: rgba(255,255,255,0.7);
+            border-radius: 2px;
+        }
 
         /* ── Contenido principal ── */
         #main {
@@ -114,7 +141,7 @@
             line-height: 1.6;
         }
 
-        /* Sección: Crear */
+        /* Sección: títulos */
         .seccion-titulo {
             font-size: 11px;
             text-transform: uppercase;
@@ -122,6 +149,8 @@
             color: var(--text-faint);
             margin-bottom: 14px;
         }
+
+        /* Grid de creación */
         .crear-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -186,10 +215,8 @@
             text-transform: uppercase;
         }
 
-        /* Sección: Lista calendarios */
-        .lista-section {
-            animation: fadeUp 0.5s 0.2s ease both;
-        }
+        /* ── Lista de calendarios ── */
+        .lista-section { animation: fadeUp 0.5s 0.2s ease both; }
         #lista-header {
             display: flex;
             align-items: center;
@@ -212,11 +239,7 @@
         #buscador::placeholder { color: var(--text-faint); }
 
         /* Tabs */
-        .tabs {
-            display: flex;
-            gap: 6px;
-            margin-bottom: 16px;
-        }
+        .tabs { display: flex; gap: 6px; margin-bottom: 16px; }
         .tab {
             padding: 6px 16px;
             border-radius: 20px;
@@ -282,15 +305,8 @@
         }
         .cal-badge.personal { background: rgba(91,63,212,0.2); color: #a78bfa; }
         .cal-badge.grupal   { background: rgba(39,174,96,0.18); color: #6ee7b7; }
-        .cal-card strong {
-            font-size: 14px;
-            font-weight: 700;
-            display: block;
-        }
-        .cal-card small {
-            font-size: 11px;
-            color: var(--text-faint);
-        }
+        .cal-card strong { font-size: 14px; font-weight: 700; display: block; }
+        .cal-card small   { font-size: 11px; color: var(--text-faint); }
         .cal-card-footer {
             display: flex;
             align-items: center;
@@ -332,7 +348,7 @@
         .vacio span { font-size: 40px; display: block; margin-bottom: 12px; }
         .vacio p { font-size: 13px; line-height: 1.6; }
 
-        /* Modal crear */
+        /* ── Modal crear calendario ── */
         #modal-crear {
             display: none;
             position: fixed;
@@ -354,16 +370,8 @@
             box-shadow: 0 24px 80px rgba(0,0,0,0.6);
             animation: popIn 0.25s ease;
         }
-        #modal-caja h3 {
-            font-size: 18px;
-            font-weight: 800;
-            margin-bottom: 6px;
-        }
-        #modal-caja .subtitulo {
-            font-size: 12px;
-            color: var(--text-dim);
-            margin-bottom: 24px;
-        }
+        #modal-caja h3 { font-size: 18px; font-weight: 800; margin-bottom: 6px; }
+        #modal-caja .subtitulo { font-size: 12px; color: var(--text-dim); margin-bottom: 24px; }
         #modal-caja label {
             display: block;
             font-size: 11px;
@@ -400,17 +408,11 @@
             cursor: pointer;
             transition: all 0.2s;
         }
-        .tipo-opcion.sel {
-            border-color: var(--purple);
-            background: var(--purple-soft);
-        }
+        .tipo-opcion.sel { border-color: var(--purple); background: var(--purple-soft); }
         .tipo-opcion span { font-size: 24px; display: block; margin-bottom: 6px; }
         .tipo-opcion strong { font-size: 13px; display: block; }
         .tipo-opcion p { font-size: 10px; color: var(--text-faint); margin-top: 2px; }
-        .modal-botones {
-            display: flex;
-            gap: 10px;
-        }
+        .modal-botones { display: flex; gap: 10px; }
         .btn-confirmar {
             flex: 1;
             padding: 11px;
@@ -438,12 +440,11 @@
         }
         .btn-cancelar-modal:hover { background: rgba(255,255,255,0.06); }
 
-        /* ── Panel IA (igual que en calendario) ── */
+        /* ── Panel IA ── */
         #panel-ia {
             position: fixed;
             bottom: 24px;
-            left: 50%;
-            transform: translateX(-50%);
+            right: 28px;
             background: rgba(20,16,40,0.92);
             backdrop-filter: blur(16px);
             border: 1px solid rgba(124,92,232,0.25);
@@ -457,27 +458,12 @@
             max-width: 560px;
             box-shadow: 0 8px 32px rgba(0,0,0,0.5);
         }
-        #panel-ia-header {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-shrink: 0;
-        }
+        #panel-ia-header { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
         #ia-icono { font-size: 20px; }
         #ia-nombre { font-size: 12px; font-weight: 700; color: #fff; }
         #ia-estado { font-size: 10px; color: #a78bfa; }
-        #ia-separador {
-            width: 1px;
-            height: 32px;
-            background: rgba(255,255,255,0.1);
-            flex-shrink: 0;
-        }
-        #ia-mensaje {
-            font-size: 12px;
-            color: rgba(255,255,255,0.7);
-            line-height: 1.5;
-            flex: 1;
-        }
+        #ia-separador { width: 1px; height: 32px; background: rgba(255,255,255,0.1); flex-shrink: 0; }
+        #ia-mensaje { font-size: 12px; color: rgba(255,255,255,0.7); line-height: 1.5; flex: 1; }
         #mensaje-motivacional {
             font-size: 11px;
             color: rgba(255,255,255,0.35);
@@ -485,6 +471,243 @@
             white-space: nowrap;
         }
 
+        /* ── Notas personales ── */
+        .notas-card {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+        #notas-texto {
+            width: 100%;
+            min-height: 130px;
+            background: transparent;
+            border: none;
+            padding: 18px 20px;
+            color: var(--text);
+            font-size: 13px;
+            font-family: var(--font);
+            resize: vertical;
+            line-height: 1.7;
+            outline: none;
+        }
+        #notas-texto::placeholder { color: var(--text-faint); }
+        .notas-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 16px;
+            border-top: 1px solid var(--border);
+            background: rgba(255,255,255,0.02);
+        }
+        #notas-estado { font-size: 11px; color: var(--text-faint); transition: color 0.3s; }
+        .btn-guardar-nota {
+            padding: 6px 16px;
+            background: linear-gradient(135deg, var(--purple2), var(--purple));
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 12px;
+            font-family: var(--font);
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .btn-guardar-nota:hover { opacity: 0.85; }
+
+        /* ── Disponibilidad ── */
+        .disponibilidad-intro {
+            font-size: 12px;
+            color: var(--text-dim);
+            margin-bottom: 18px;
+            line-height: 1.6;
+        }
+        .form-bloque {
+            display: grid;
+            grid-template-columns: 1.8fr 1fr 1fr 1fr auto;
+            gap: 10px;
+            align-items: end;
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-bottom: 14px;
+        }
+        .form-bloque label {
+            display: block;
+            font-size: 10px;
+            color: var(--text-faint);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 5px;
+        }
+        .form-bloque select,
+        .form-bloque input[type="time"] {
+            width: 100%;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 10px;
+            color: var(--text);
+            font-size: 12px;
+            font-family: var(--font);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .form-bloque select:focus,
+        .form-bloque input[type="time"]:focus { border-color: rgba(124,92,232,0.5); }
+        .form-bloque select option { background: #1a1530; }
+        .btn-agregar-bloque {
+            padding: 8px 16px;
+            background: linear-gradient(135deg, var(--purple2), var(--purple));
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .btn-agregar-bloque:hover { opacity: 0.85; }
+        #lista-bloques { display: flex; flex-direction: column; gap: 8px; }
+        .bloque-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px 14px;
+            animation: fadeUp 0.2s ease;
+        }
+        .bloque-emoji { font-size: 20px; flex-shrink: 0; }
+        .bloque-info { flex: 1; }
+        .bloque-titulo { font-size: 13px; color: var(--text); font-weight: 600; }
+        .bloque-detalle { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+        .bloque-activo {
+            display: inline-block;
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: #06d6a0;
+            margin-right: 4px;
+            box-shadow: 0 0 6px #06d6a0;
+        }
+        .btn-del-bloque {
+            background: transparent;
+            border: none;
+            color: var(--text-faint);
+            font-size: 14px;
+            cursor: pointer;
+            padding: 4px 6px;
+            border-radius: 6px;
+            transition: color 0.2s, background 0.2s;
+        }
+        .btn-del-bloque:hover { color: #fc8181; background: rgba(252,129,129,0.1); }
+        .sin-bloques {
+            text-align: center;
+            padding: 24px;
+            color: var(--text-faint);
+            font-size: 12px;
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+        }
+
+        /* ── Panel perfil ── */
+        #panel-perfil {
+            display: none;
+            position: fixed;
+            top: 64px;
+            right: 20px;
+            width: 300px;
+            background: #1a1530;
+            border: 1px solid rgba(124,92,232,0.3);
+            border-radius: 20px;
+            padding: 24px;
+            z-index: 300;
+            box-shadow: 0 16px 60px rgba(0,0,0,0.6);
+            animation: popIn 0.2s ease;
+        }
+        #panel-perfil.visible { display: block; }
+        .perfil-avatar {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--purple2), var(--purple));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin: 0 auto 12px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid rgba(124,92,232,0.4);
+            transition: border-color 0.2s;
+        }
+        .perfil-avatar:hover { border-color: var(--purple); }
+        .perfil-avatar img { width:100%; height:100%; object-fit:cover; border-radius:50%; }
+        .perfil-avatar-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .perfil-avatar:hover .perfil-avatar-overlay { opacity: 1; }
+        #input-foto { display: none; }
+        .perfil-nombre { text-align: center; font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+        .perfil-email { text-align: center; font-size: 11px; color: var(--text-dim); margin-bottom: 20px; }
+        .perfil-separador { height: 1px; background: var(--border); margin-bottom: 16px; }
+        .perfil-campo label {
+            display: block;
+            font-size: 10px;
+            color: var(--text-faint);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 5px;
+        }
+        .perfil-campo input {
+            width: 100%;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 9px 12px;
+            color: var(--text);
+            font-size: 13px;
+            font-family: var(--font);
+            outline: none;
+            margin-bottom: 12px;
+            transition: border-color 0.2s;
+        }
+        .perfil-campo input:focus { border-color: rgba(124,92,232,0.6); }
+        .perfil-campo input::placeholder { color: var(--text-faint); }
+        .btn-guardar-perfil {
+            width: 100%;
+            padding: 10px;
+            background: linear-gradient(135deg, var(--purple2), var(--purple));
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 13px;
+            font-family: var(--font);
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 4px;
+            transition: opacity 0.2s;
+        }
+        .btn-guardar-perfil:hover { opacity: 0.88; }
+        .perfil-msg {
+            font-size: 11px;
+            text-align: center;
+            margin-top: 8px;
+            min-height: 16px;
+            color: #06d6a0;
+        }
+
+        /* ── Animaciones ── */
         @keyframes fadeUp {
             from { opacity: 0; transform: translateY(16px); }
             to   { opacity: 1; transform: translateY(0); }
@@ -494,10 +717,14 @@
             to   { opacity: 1; transform: scale(1); }
         }
 
+        /* ── Responsive ── */
         @media (max-width: 600px) {
             .crear-grid { grid-template-columns: 1fr; }
             #buscador { width: 130px; }
             .hero h2 { font-size: 24px; }
+            .form-bloque { grid-template-columns: 1fr 1fr; }
+            .btn-agregar-bloque { grid-column: 1 / -1; }
+            #panel-ia { min-width: unset; width: calc(100vw - 32px); right: 16px; }
         }
     </style>
 </head>
@@ -510,11 +737,16 @@
             <h1>🌙 Lunefia</h1>
             <p>Tu calendario grupal inteligente</p>
         </div>
+        <!-- FIX: botones del header corregidos — se eliminó el </button> huérfano -->
         <div style="display:flex;align-items:center;gap:16px">
             <span id="saludo-usuario">Hola, {{ usuario }} 👋</span>
+            <!-- FIX: botón menú hamburguesa ahora tiene HTML real y llama a togglePerfil() -->
+            <button id="btn-menu" type="button" onclick="togglePerfil()" aria-label="Abrir menú de perfil">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
             <a href="/logout" class="btn-logout">Salir</a>
-             <span></span><span></span><span></span>
-    </button>
         </div>
     </div>
 </header>
@@ -530,16 +762,17 @@
 
     <!-- Crear nuevo -->
     <p class="seccion-titulo">✨ Crear nuevo</p>
+    <!-- FIX: type="button" para evitar submit accidental -->
     <div class="crear-grid">
-        <button class="crear-card" onclick="abrirModal('personal')">
+        <button type="button" class="crear-card" onclick="abrirModal('personal')">
             <div class="tag-nuevo">Nuevo</div>
-            <span class="icono">🗓</span>
+            <span class="icono" aria-hidden="true">🗓</span>
             <strong>Personal</strong>
             <p>Solo para ti. Organiza tus tareas, exámenes y proyectos.</p>
         </button>
-        <button class="crear-card" onclick="abrirModal('grupal')">
+        <button type="button" class="crear-card" onclick="abrirModal('grupal')">
             <div class="tag-nuevo">Nuevo</div>
-            <span class="icono">👥</span>
+            <span class="icono" aria-hidden="true">👥</span>
             <strong>Grupal</strong>
             <p>Comparte con tu equipo y coordinen juntos.</p>
         </button>
@@ -549,41 +782,42 @@
     <div class="lista-section">
         <div id="lista-header">
             <p class="seccion-titulo" style="margin:0">📅 Mis calendarios</p>
-            <input id="buscador" placeholder="🔍 Buscar..." oninput="filtrarCalendarios()">
+            <input id="buscador" type="search" placeholder="🔍 Buscar..." aria-label="Buscar calendarios" oninput="filtrarCalendarios()">
         </div>
 
-        <div class="tabs">
-            <button class="tab activo" onclick="cambiarTab(this,'todos')">Todos</button>
-            <button class="tab" onclick="cambiarTab(this,'personal')">Personal</button>
-            <button class="tab" onclick="cambiarTab(this,'grupal')">Grupal</button>
+        <div class="tabs" role="tablist">
+            <button type="button" class="tab activo" role="tab" aria-selected="true"  onclick="cambiarTab(this,'todos')">Todos</button>
+            <button type="button" class="tab"        role="tab" aria-selected="false" onclick="cambiarTab(this,'personal')">Personal</button>
+            <button type="button" class="tab"        role="tab" aria-selected="false" onclick="cambiarTab(this,'grupal')">Grupal</button>
         </div>
 
-        <div id="calendarios-lista">
+        <div id="calendarios-lista" role="list">
             <!-- Se rellena con JS -->
         </div>
     </div>
-      <!-- Notas personales -->
+
+    <!-- Notas personales -->
     <div style="margin-top: 44px; animation: fadeUp 0.5s 0.3s ease both;">
         <p class="seccion-titulo">📝 Mis notas personales</p>
         <div class="notas-card">
-            <textarea id="notas-texto" placeholder="Escribe aquí tus apuntes, ideas, recordatorios... Solo tú las ves 🌙"></textarea>
+            <textarea id="notas-texto" placeholder="Escribe aquí tus apuntes, ideas, recordatorios... Solo tú las ves 🌙" aria-label="Notas personales"></textarea>
             <div class="notas-footer">
-                <span id="notas-estado"></span>
-                <button class="btn-guardar-nota" onclick="guardarNota()">Guardar 💾</button>
+                <span id="notas-estado" aria-live="polite"></span>
+                <button type="button" class="btn-guardar-nota" onclick="guardarNota()">Guardar 💾</button>
             </div>
         </div>
     </div>
- 
+
     <!-- Disponibilidad -->
     <div style="margin-top: 44px; margin-bottom: 100px; animation: fadeUp 0.5s 0.35s ease both;">
         <p class="seccion-titulo">⏰ Mi disponibilidad</p>
         <p class="disponibilidad-intro">
             Marca cuándo normalmente estás ocupada. La IA avisará a tus compañeras y sugerirá horarios donde todas puedan trabajar juntas.
         </p>
- 
+
         <div class="form-bloque">
             <div>
-                <label>Actividad</label>
+                <label for="disp-tipo">Actividad</label>
                 <select id="disp-tipo">
                     <option value="dormir">💤 Dormir</option>
                     <option value="estudiar">📚 Estudiar / Clases</option>
@@ -594,7 +828,7 @@
                 </select>
             </div>
             <div>
-                <label>Día</label>
+                <label for="disp-dia">Día</label>
                 <select id="disp-dia">
                     <option value="todos">Todos los días</option>
                     <option value="lunes">Lunes</option>
@@ -607,94 +841,95 @@
                 </select>
             </div>
             <div>
-                <label>De</label>
+                <label for="disp-inicio">De</label>
                 <input type="time" id="disp-inicio" value="23:00">
             </div>
             <div>
-                <label>Hasta</label>
+                <label for="disp-fin">Hasta</label>
                 <input type="time" id="disp-fin" value="07:00">
             </div>
-            <button class="btn-agregar-bloque" onclick="agregarBloque()" title="Agregar">+</button>
+            <button type="button" class="btn-agregar-bloque" onclick="agregarBloque()" aria-label="Agregar bloque de disponibilidad">+</button>
         </div>
- 
-        <div id="lista-bloques">
+
+        <div id="lista-bloques" aria-live="polite">
             <div class="sin-bloques">Todavía no tienes bloques de disponibilidad 🌙</div>
         </div>
     </div>
 </main>
 
 <!-- Panel IA -->
-<div id="panel-ia">
+<aside id="panel-ia" aria-label="Asistente Lunefia IA">
     <div id="panel-ia-header">
-        <span id="ia-icono">🌙</span>
+        <span id="ia-icono" aria-hidden="true">🌙</span>
         <div>
             <p id="ia-nombre">Lunefia IA</p>
             <span id="ia-estado">● activa</span>
         </div>
     </div>
-    <div id="ia-separador"></div>
+    <div id="ia-separador" aria-hidden="true"></div>
     <p id="ia-mensaje">Cargando tu resumen...</p>
-    <div id="mensaje-motivacional"></div>
-</div>
+    <div id="mensaje-motivacional" aria-live="polite"></div>
+</aside>
 
 <!-- Modal crear calendario -->
-<div id="modal-crear">
+<div id="modal-crear" role="dialog" aria-modal="true" aria-labelledby="modal-titulo">
     <div id="modal-caja">
         <h3 id="modal-titulo">Nuevo calendario</h3>
-        <p class="subtitulo" id="modal-sub">Dale un nombre a tu calendario</p>
-        <label>Nombre</label>
-        <input id="modal-nombre" type="text" placeholder="Ej: Biología 2026, Equipo dev...">
+        <p class="subtitulo">Dale un nombre a tu calendario</p>
+        <label for="modal-nombre">Nombre</label>
+        <input id="modal-nombre" type="text" placeholder="Ej: Biología 2026, Equipo dev..." autocomplete="off">
         <label>Tipo</label>
         <div class="modal-tipo-grid">
-            <div class="tipo-opcion sel" id="tipo-personal" onclick="selTipo('personal')">
-                <span>🗓</span>
+            <div class="tipo-opcion sel" id="tipo-personal" role="radio" aria-checked="true" tabindex="0" onclick="selTipo('personal')" onkeydown="if(event.key==='Enter'||event.key===' ')selTipo('personal')">
+                <span aria-hidden="true">🗓</span>
                 <strong>Personal</strong>
                 <p>Solo para ti</p>
             </div>
-            <div class="tipo-opcion" id="tipo-grupal" onclick="selTipo('grupal')">
-                <span>👥</span>
+            <div class="tipo-opcion" id="tipo-grupal" role="radio" aria-checked="false" tabindex="0" onclick="selTipo('grupal')" onkeydown="if(event.key==='Enter'||event.key===' ')selTipo('grupal')">
+                <span aria-hidden="true">👥</span>
                 <strong>Grupal</strong>
                 <p>Con tu equipo</p>
             </div>
         </div>
         <div class="modal-botones">
-            <button class="btn-confirmar" onclick="confirmarCrear()">Crear calendario ✨</button>
-            <button class="btn-cancelar-modal" onclick="cerrarModal()">Cancelar</button>
+            <button type="button" class="btn-confirmar" onclick="confirmarCrear()">Crear calendario ✨</button>
+            <button type="button" class="btn-cancelar-modal" onclick="cerrarModal()">Cancelar</button>
         </div>
     </div>
 </div>
 
 <!-- Panel perfil -->
-<div id="panel-perfil">
+<div id="panel-perfil" role="dialog" aria-label="Panel de perfil">
     <input type="file" id="input-foto" accept="image/*" onchange="cambiarFoto(event)">
-    <div class="perfil-avatar" onclick="document.getElementById('input-foto').click()">
-        <span id="avatar-emoji">🌙</span>
-        <img id="avatar-img" src="" style="display:none">
-        <div class="perfil-avatar-overlay">📷</div>
+    <div class="perfil-avatar" onclick="document.getElementById('input-foto').click()" role="button" tabindex="0" aria-label="Cambiar foto de perfil">
+        <span id="avatar-emoji" aria-hidden="true">🌙</span>
+        <img id="avatar-img" src="" alt="Foto de perfil" style="display:none">
+        <div class="perfil-avatar-overlay" aria-hidden="true">📷</div>
     </div>
     <div class="perfil-nombre">{{ usuario }}</div>
     <div class="perfil-email">Perfil de usuario</div>
     <div class="perfil-separador"></div>
     <div class="perfil-campo">
-        <label>Nuevo nombre de usuario</label>
-        <input type="text" id="input-nuevo-nombre" placeholder="Escribe tu nuevo nombre...">
+        <label for="input-nuevo-nombre">Nuevo nombre de usuario</label>
+        <input type="text" id="input-nuevo-nombre" placeholder="Escribe tu nuevo nombre..." autocomplete="username">
     </div>
     <div class="perfil-campo">
-        <label>Nueva contraseña</label>
-        <input type="password" id="input-nueva-pass" placeholder="Nueva contraseña...">
+        <label for="input-nueva-pass">Nueva contraseña</label>
+        <input type="password" id="input-nueva-pass" placeholder="Nueva contraseña..." autocomplete="new-password">
     </div>
     <div class="perfil-campo">
-        <label>Confirmar contraseña</label>
-        <input type="password" id="input-confirmar-pass" placeholder="Repite la contraseña...">
+        <label for="input-confirmar-pass">Confirmar contraseña</label>
+        <input type="password" id="input-confirmar-pass" placeholder="Repite la contraseña..." autocomplete="new-password">
     </div>
-    <button class="btn-guardar-perfil" onclick="guardarPerfil()">Guardar cambios ✨</button>
-    <div class="perfil-msg" id="perfil-msg"></div>
+    <button type="button" class="btn-guardar-perfil" onclick="guardarPerfil()">Guardar cambios ✨</button>
+    <div class="perfil-msg" id="perfil-msg" aria-live="polite"></div>
 </div>
 
 <script>
     let tabActual = 'todos';
     let tipoSeleccionado = 'personal';
     let todosLosCalendarios = [];
+    let notaTimer = null;
 
     // ── IA ──
     async function cargarMensajeIA() {
@@ -706,7 +941,6 @@
                 el.textContent = '¡Hola! Crea tu primer calendario para empezar 🌙';
                 return;
             }
-            // Buscar eventos próximos en todos los calendarios
             let todosProximos = [];
             for (const cal of lista) {
                 try {
@@ -755,9 +989,7 @@
             mensajes[Math.floor(Math.random() * mensajes.length)];
     }
 
-    // ── Cargar calendarios al iniciar ──
-    document.addEventListener('DOMContentLoaded', cargarCalendarios);
-
+    // ── Calendarios ──
     async function cargarCalendarios() {
         try {
             const res = await fetch('/api/calendarios');
@@ -779,7 +1011,7 @@
         if (final.length === 0) {
             contenedor.innerHTML = `
                 <div class="vacio">
-                    <span>🌙</span>
+                    <span aria-hidden="true">🌙</span>
                     <p>Todavía no tienes calendarios aquí.<br>¡Crea uno arriba para empezar!</p>
                 </div>`;
             return;
@@ -790,10 +1022,11 @@
             const card = document.createElement('div');
             card.className = 'cal-card';
             card.style.animationDelay = `${i * 0.05}s`;
+            card.setAttribute('role', 'listitem');
             const esGrupal = c.tipo === 'grupal';
             card.innerHTML = `
                 <div class="cal-card-top">
-                    <div class="cal-icono ${c.tipo}">${esGrupal ? '👥' : '🗓'}</div>
+                    <div class="cal-icono ${c.tipo}" aria-hidden="true">${esGrupal ? '👥' : '🗓'}</div>
                     <span class="cal-badge ${c.tipo}">${c.tipo}</span>
                 </div>
                 <div>
@@ -801,27 +1034,27 @@
                     <small>${esGrupal ? 'Calendario grupal' : 'Calendario personal'}</small>
                 </div>
                 <div class="cal-card-footer">
-                    <button class="btn-abrir" onclick="abrirCalendario('${c.id}')">Abrir →</button>
-                    <button class="btn-borrar-cal" onclick="borrarCalendario('${c.id}', event)" title="Borrar">🗑</button>
+                    <button type="button" class="btn-abrir" onclick="abrirCalendario('${c.id}')">Abrir →</button>
+                    <button type="button" class="btn-borrar-cal" onclick="borrarCalendario('${c.id}', event)" aria-label="Borrar ${c.nombre}">🗑</button>
                 </div>`;
             contenedor.appendChild(card);
         });
     }
 
-    function filtrarCalendarios() {
-        renderCalendarios(todosLosCalendarios);
-    }
+    function filtrarCalendarios() { renderCalendarios(todosLosCalendarios); }
 
     function cambiarTab(btn, tipo) {
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('activo'));
+        document.querySelectorAll('.tab').forEach(t => {
+            t.classList.remove('activo');
+            t.setAttribute('aria-selected', 'false');
+        });
         btn.classList.add('activo');
+        btn.setAttribute('aria-selected', 'true');
         tabActual = tipo;
         renderCalendarios(todosLosCalendarios);
     }
 
-    function abrirCalendario(id) {
-        window.location.href = `/calendario/${id}`;
-    }
+    function abrirCalendario(id) { window.location.href = `/calendario/${id}`; }
 
     async function borrarCalendario(id, e) {
         e.stopPropagation();
@@ -849,16 +1082,16 @@
     }
 
     function actualizarTipoModal() {
-        document.getElementById('tipo-personal').classList.toggle('sel', tipoSeleccionado === 'personal');
-        document.getElementById('tipo-grupal').classList.toggle('sel', tipoSeleccionado === 'grupal');
+        const esPersonal = tipoSeleccionado === 'personal';
+        document.getElementById('tipo-personal').classList.toggle('sel', esPersonal);
+        document.getElementById('tipo-personal').setAttribute('aria-checked', esPersonal);
+        document.getElementById('tipo-grupal').classList.toggle('sel', !esPersonal);
+        document.getElementById('tipo-grupal').setAttribute('aria-checked', !esPersonal);
     }
 
     async function confirmarCrear() {
         const nombre = document.getElementById('modal-nombre').value.trim();
-        if (!nombre) {
-            document.getElementById('modal-nombre').focus();
-            return;
-        }
+        if (!nombre) { document.getElementById('modal-nombre').focus(); return; }
         await fetch('/api/calendarios', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -868,22 +1101,7 @@
         await cargarCalendarios();
     }
 
-    // Enter en el input del modal
-    document.addEventListener('DOMContentLoaded', () => {
-        cargarCalendarios();
-        cargarMensajeIA();
-        mostrarMotivacion();
-        document.getElementById('modal-nombre').addEventListener('keydown', e => {
-            if (e.key === 'Enter') confirmarCrear();
-            if (e.key === 'Escape') cerrarModal();
-        });
-    });
-
-    // Click fuera del modal
-    document.getElementById('modal-crear').addEventListener('click', function(e) {
-        if (e.target === this) cerrarModal();
-    });
-     // ── Notas ──────────────────────────────────────────────────
+    // ── Notas ──
     async function cargarNota() {
         try {
             const res = await fetch('/api/notas');
@@ -894,7 +1112,7 @@
             }
         } catch {}
     }
- 
+
     async function guardarNota() {
         const texto = document.getElementById('notas-texto').value;
         const estado = document.getElementById('notas-estado');
@@ -912,21 +1130,13 @@
             estado.style.color = '#fc8181';
         }
     }
- 
-    // Guardado automático al dejar de escribir
-    let notaTimer = null;
-    document.getElementById('notas-texto')?.addEventListener('input', () => {
-        clearTimeout(notaTimer);
-        document.getElementById('notas-estado').textContent = 'Escribiendo...';
-        notaTimer = setTimeout(guardarNota, 3000);
-    });
- 
-    // ── Disponibilidad ─────────────────────────────────────────
+
+    // ── Disponibilidad ──
     const EMOJIS_TIPO = { dormir:'💤', estudiar:'📚', trabajar:'💼', ejercicio:'🏃', comer:'🍽', descanso:'🎮' };
     const LABELS_TIPO = { dormir:'Dormir', estudiar:'Estudiar / Clases', trabajar:'Trabajar', ejercicio:'Ejercicio', comer:'Comer', descanso:'Descanso personal' };
-    const DIAS_ES = { todos:'Todos los días', lunes:'Lunes', martes:'Martes', miercoles:'Miércoles', jueves:'Jueves', viernes:'Viernes', sabado:'Sábado', domingo:'Domingo' };
+    const DIAS_ES    = { todos:'Todos los días', lunes:'Lunes', martes:'Martes', miercoles:'Miércoles', jueves:'Jueves', viernes:'Viernes', sabado:'Sábado', domingo:'Domingo' };
     let bloques = [];
- 
+
     async function cargarBloques() {
         try {
             const res = await fetch('/api/disponibilidad');
@@ -934,7 +1144,7 @@
             renderBloques();
         } catch {}
     }
- 
+
     function esBloqueActivo(b, diaActual, minActual) {
         if (b.dia !== 'todos' && b.dia !== diaActual) return false;
         const [hI, mI] = b.inicio.split(':').map(Number);
@@ -944,7 +1154,7 @@
             ? (minActual >= minI || minActual <= minF)
             : (minActual >= minI && minActual <= minF);
     }
- 
+
     function renderBloques() {
         const contenedor = document.getElementById('lista-bloques');
         if (!bloques.length) {
@@ -960,20 +1170,20 @@
             const div = document.createElement('div');
             div.className = 'bloque-item';
             div.innerHTML = `
-                <span class="bloque-emoji">${EMOJIS_TIPO[b.tipo] || '⏰'}</span>
+                <span class="bloque-emoji" aria-hidden="true">${EMOJIS_TIPO[b.tipo] || '⏰'}</span>
                 <div class="bloque-info">
                     <div class="bloque-titulo">
-                        ${activo ? '<span class="bloque-activo"></span>' : ''}
+                        ${activo ? '<span class="bloque-activo" aria-hidden="true"></span>' : ''}
                         ${LABELS_TIPO[b.tipo] || b.tipo}
                         ${activo ? '<span style="font-size:11px;color:#06d6a0;font-weight:400"> · activo ahora</span>' : ''}
                     </div>
                     <div class="bloque-detalle">${DIAS_ES[b.dia] || b.dia} · ${b.inicio} – ${b.fin}</div>
                 </div>
-                <button class="btn-del-bloque" onclick="eliminarBloque(${i})">🗑</button>`;
+                <button type="button" class="btn-del-bloque" onclick="eliminarBloque(${i})" aria-label="Eliminar bloque">🗑</button>`;
             contenedor.appendChild(div);
         });
     }
- 
+
     async function agregarBloque() {
         const tipo   = document.getElementById('disp-tipo').value;
         const dia    = document.getElementById('disp-dia').value;
@@ -988,13 +1198,13 @@
         await cargarBloques();
         actualizarIADisponibilidad();
     }
- 
+
     async function eliminarBloque(index) {
         await fetch(`/api/disponibilidad/${index}`, { method: 'DELETE' });
         await cargarBloques();
         actualizarIADisponibilidad();
     }
- 
+
     async function actualizarIADisponibilidad() {
         const el = document.getElementById('ia-mensaje');
         try {
@@ -1015,83 +1225,101 @@
             if (msg) el.textContent = msg;
         } catch {}
     }
- 
-    // Cargar todo al iniciar
+
+    // ── Perfil ──
+    function togglePerfil() {
+        document.getElementById('panel-perfil').classList.toggle('visible');
+    }
+
+    function cambiarFoto(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = e => {
+            document.getElementById('avatar-emoji').style.display = 'none';
+            const img = document.getElementById('avatar-img');
+            img.src = e.target.result;
+            img.style.display = 'block';
+            localStorage.setItem('lunefia_foto', e.target.result);
+        };
+        reader.readAsDataURL(file);
+    }
+
+    async function guardarPerfil() {
+        const nuevoNombre = document.getElementById('input-nuevo-nombre').value.trim();
+        const nuevaPass   = document.getElementById('input-nueva-pass').value;
+        const confirmar   = document.getElementById('input-confirmar-pass').value;
+        const msg         = document.getElementById('perfil-msg');
+        if (nuevaPass && nuevaPass !== confirmar) {
+            msg.style.color = '#fc8181';
+            msg.textContent = 'Las contraseñas no coinciden 💔';
+            return;
+        }
+        const res = await fetch('/api/perfil', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nuevo_nombre: nuevoNombre, nueva_pass: nuevaPass })
+        });
+        const data = await res.json();
+        if (data.ok) {
+            msg.style.color = '#06d6a0';
+            msg.textContent = '✓ Guardado correctamente';
+            if (nuevoNombre) document.getElementById('saludo-usuario').textContent = `Hola, ${nuevoNombre} 👋`;
+            setTimeout(() => {
+                msg.textContent = '';
+                document.getElementById('panel-perfil').classList.remove('visible');
+            }, 1500);
+        } else {
+            msg.style.color = '#fc8181';
+            msg.textContent = data.error || 'Error al guardar';
+        }
+    }
+
+    // ── Init: un solo DOMContentLoaded ──
     document.addEventListener('DOMContentLoaded', () => {
+        cargarCalendarios();
+        cargarMensajeIA();
+        mostrarMotivacion();
         cargarNota();
         cargarBloques();
         actualizarIADisponibilidad();
-    });
 
-    // ── Menú perfil ──
-function togglePerfil() {
-    document.getElementById('panel-perfil').classList.toggle('visible');
-}
-document.addEventListener('click', function(e) {
-    const panel = document.getElementById('panel-perfil');
-    const btn = document.getElementById('btn-menu');
-    if (!panel.contains(e.target) && !btn.contains(e.target)) {
-        panel.classList.remove('visible');
-    }
-});
+        // Modal: teclado
+        document.getElementById('modal-nombre').addEventListener('keydown', e => {
+            if (e.key === 'Enter')  confirmarCrear();
+            if (e.key === 'Escape') cerrarModal();
+        });
 
-function cambiarFoto(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = e => {
-        document.getElementById('avatar-emoji').style.display = 'none';
-        const img = document.getElementById('avatar-img');
-        img.src = e.target.result;
-        img.style.display = 'block';
-        localStorage.setItem('lunefia_foto', e.target.result);
-    };
-    reader.readAsDataURL(file);
-}
+        // Modal: clic fuera
+        document.getElementById('modal-crear').addEventListener('click', function(e) {
+            if (e.target === this) cerrarModal();
+        });
 
-async function guardarPerfil() {
-    const nuevoNombre = document.getElementById('input-nuevo-nombre').value.trim();
-    const nuevaPass   = document.getElementById('input-nueva-pass').value;
-    const confirmar   = document.getElementById('input-confirmar-pass').value;
-    const msg         = document.getElementById('perfil-msg');
+        // Perfil: cerrar al clic fuera
+        document.addEventListener('click', function(e) {
+            const panel = document.getElementById('panel-perfil');
+            const btn   = document.getElementById('btn-menu');
+            if (!panel.contains(e.target) && !btn.contains(e.target)) {
+                panel.classList.remove('visible');
+            }
+        });
 
-    if (nuevaPass && nuevaPass !== confirmar) {
-        msg.style.color = '#fc8181';
-        msg.textContent = 'Las contraseñas no coinciden 💔';
-        return;
-    }
-    const res = await fetch('/api/perfil', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nuevo_nombre: nuevoNombre, nueva_pass: nuevaPass })
-    });
-    const data = await res.json();
-    if (data.ok) {
-        msg.style.color = '#06d6a0';
-        msg.textContent = '✓ Guardado correctamente';
-        if (nuevoNombre) {
-            document.getElementById('saludo').textContent = `Hola, ${nuevoNombre} 👋`;
+        // Notas: guardado automático
+        document.getElementById('notas-texto').addEventListener('input', () => {
+            clearTimeout(notaTimer);
+            document.getElementById('notas-estado').textContent = 'Escribiendo...';
+            notaTimer = setTimeout(guardarNota, 3000);
+        });
+
+        // Foto guardada
+        const foto = localStorage.getItem('lunefia_foto');
+        if (foto) {
+            document.getElementById('avatar-emoji').style.display = 'none';
+            const img = document.getElementById('avatar-img');
+            img.src = foto;
+            img.style.display = 'block';
         }
-        setTimeout(() => {
-            msg.textContent = '';
-            document.getElementById('panel-perfil').classList.remove('visible');
-        }, 1500);
-    } else {
-        msg.style.color = '#fc8181';
-        msg.textContent = data.error || 'Error al guardar';
-    }
-}
-
-// Cargar foto guardada
-window.addEventListener('load', () => {
-    const foto = localStorage.getItem('lunefia_foto');
-    if (foto) {
-        document.getElementById('avatar-emoji').style.display = 'none';
-        const img = document.getElementById('avatar-img');
-        img.src = foto;
-        img.style.display = 'block';
-    }
-});
+    });
 </script>
 
 </body>
