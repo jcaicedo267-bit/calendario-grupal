@@ -20,5 +20,13 @@
         "tipo": "tarea",
         "materia": "",
         "calendario": ""
+    },
+    {
+        "title": "jugar roblos",
+        "start": "2026-05-15T14:24",
+        "tipo": "proyecto",
+        "materia": "eso tilin",
+        "calendario": "3",
+        "due\u00f1o": "jillyc1109@gmail,com"
     }
 ]

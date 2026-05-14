@@ -74,9 +74,9 @@ body::before {
     border-bottom: 1px solid var(--border);
 }
 #encabezado-contenido {
-    max-width: 1100px;
+    max-width: 100%;
     margin: 0 auto;
-    padding: 14px 28px;
+    padding: 14px 40px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -136,9 +136,26 @@ body::before {
 #main {
     position: relative;
     z-index: 1;
-    max-width: 820px;
+    max-width: 100%;
     margin: 0 auto;
     padding: 48px 24px 80px;
+}
+#layout-dos-columnas {
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 32px;
+    align-items: start;
+}
+#columna-lateral-home {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    position: sticky;
+    top: 80px;
+}
+@media (max-width: 860px) {
+    #layout-dos-columnas { grid-template-columns: 1fr; }
+    #columna-lateral-home { position: static; }
 }
  
 /* Hero */
@@ -793,7 +810,7 @@ body::before {
  
 #btn-agregar {
     position: fixed;
-    bottom: 30px; right: 30px;
+    bottom: 100px; right: 30px;
     width: 52px; height: 52px;
     background: linear-gradient(135deg, var(--purple2), var(--purple));
     color: white;
@@ -921,4 +938,9 @@ body::before {
     .form-bloque { grid-template-columns: 1fr 1fr; }
     .btn-agregar-bloque { grid-column: 1 / -1; }
     #panel-ia { min-width: unset; width: calc(100vw - 32px); right: 16px; }
+}
+
+.fc-agregarPersonas-button {
+    background: rgba(124,92,232,0.3) !important;
+    border-color: rgba(124,92,232,0.5) !important;
 }

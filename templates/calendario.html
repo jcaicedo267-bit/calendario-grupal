@@ -198,6 +198,7 @@
 
         document.addEventListener('DOMContentLoaded', async function() {
 
+            let esGrupal = false;
             // Cargar nombre del calendario
             try {
                 const res = await fetch('/api/calendarios');
@@ -206,6 +207,7 @@
                 if (actual) {
                     document.getElementById('nombre-calendario').textContent =
                         (actual.tipo === 'grupal' ? '👥 ' : '🗓 ') + actual.nombre;
+                    esGrupal = actual.tipo === 'grupal';
                 }
             } catch {}
 
@@ -213,8 +215,14 @@
                 initialView: 'dayGridMonth',
                 locale: 'es',
                 nowIndicator: true,
+                customButtons: {
+                    agregarPersonas: {
+                        text: '+ Personas',
+                        click: function() { abrirModalPersonas(); }
+                    }
+                },    
                 headerToolbar: {
-                    left: 'prev,next today',
+                    left: esGrupal ? 'prev,next today agregarPersonas' : 'prev,next today',
                     center: 'title',
                     right: 'dayGridMonth,timeGridWeek,timeGridDay'
                 },
@@ -225,9 +233,17 @@
                 },
                 eventDidMount: function(info) {
                     const tipo = info.event.extendedProps.tipo;
+                    const dueño = info.event.extendedProps.dueño;
                     if (tipo === 'tarea')    { info.el.style.backgroundColor = '#4A90D9'; info.el.style.borderColor = '#2C6FAC'; }
                     else if (tipo === 'examen')   { info.el.style.backgroundColor = '#E74C3C'; info.el.style.borderColor = '#B03A2E'; }
                     else if (tipo === 'proyecto') { info.el.style.backgroundColor = '#27AE60'; info.el.style.borderColor = '#1E8449'; }
+                    
+                    if (esGrupal && dueño) {
+                        const tag = document.createElement('div');
+                        tag.style.cssText = 'font-size:9px; opacity:0.85; margin-top:1px;';
+                        tag.textContent = '👤 ' + dueño;
+                        info.el.querySelector('.fc-event-title')?.after(tag);
+                    }
                 },
                 eventClick: function(info) {
                     const modal = document.getElementById('modal-borrar');
