@@ -42,13 +42,13 @@ def login_requerido():
 def inicio():
     redir = login_requerido()
     if redir: return redir
-    return render_template("home.html")
+    return render_template("home.html", usuario=session.get("usuario"))
 
 @app.route("/calendario/<int:cal_id>")
 def ver_calendario(cal_id):
     redir = login_requerido()
     if redir: return redir
-    return render_template("calendario.html")
+    return render_template("calendario.html", usuario=session.get("usuario"))
 
 # -------- AUTH --------
 @app.route("/login", methods=["GET", "POST"])
