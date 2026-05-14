@@ -560,6 +560,65 @@
             <!-- Se rellena con JS -->
         </div>
     </div>
+      <!-- Notas personales -->
+    <div style="margin-top: 44px; animation: fadeUp 0.5s 0.3s ease both;">
+        <p class="seccion-titulo">📝 Mis notas personales</p>
+        <div class="notas-card">
+            <textarea id="notas-texto" placeholder="Escribe aquí tus apuntes, ideas, recordatorios... Solo tú las ves 🌙"></textarea>
+            <div class="notas-footer">
+                <span id="notas-estado"></span>
+                <button class="btn-guardar-nota" onclick="guardarNota()">Guardar 💾</button>
+            </div>
+        </div>
+    </div>
+ 
+    <!-- Disponibilidad -->
+    <div style="margin-top: 44px; margin-bottom: 100px; animation: fadeUp 0.5s 0.35s ease both;">
+        <p class="seccion-titulo">⏰ Mi disponibilidad</p>
+        <p class="disponibilidad-intro">
+            Marca cuándo normalmente estás ocupada. La IA avisará a tus compañeras y sugerirá horarios donde todas puedan trabajar juntas.
+        </p>
+ 
+        <div class="form-bloque">
+            <div>
+                <label>Actividad</label>
+                <select id="disp-tipo">
+                    <option value="dormir">💤 Dormir</option>
+                    <option value="estudiar">📚 Estudiar / Clases</option>
+                    <option value="trabajar">💼 Trabajar</option>
+                    <option value="ejercicio">🏃 Ejercicio</option>
+                    <option value="comer">🍽 Comer</option>
+                    <option value="descanso">🎮 Descanso personal</option>
+                </select>
+            </div>
+            <div>
+                <label>Día</label>
+                <select id="disp-dia">
+                    <option value="todos">Todos los días</option>
+                    <option value="lunes">Lunes</option>
+                    <option value="martes">Martes</option>
+                    <option value="miercoles">Miércoles</option>
+                    <option value="jueves">Jueves</option>
+                    <option value="viernes">Viernes</option>
+                    <option value="sabado">Sábado</option>
+                    <option value="domingo">Domingo</option>
+                </select>
+            </div>
+            <div>
+                <label>De</label>
+                <input type="time" id="disp-inicio" value="23:00">
+            </div>
+            <div>
+                <label>Hasta</label>
+                <input type="time" id="disp-fin" value="07:00">
+            </div>
+            <button class="btn-agregar-bloque" onclick="agregarBloque()" title="Agregar">+</button>
+        </div>
+ 
+        <div id="lista-bloques">
+            <div class="sin-bloques">Todavía no tienes bloques de disponibilidad 🌙</div>
+        </div>
+    </div>
 </main>
 
 <!-- Panel IA -->
@@ -794,6 +853,145 @@
     // Click fuera del modal
     document.getElementById('modal-crear').addEventListener('click', function(e) {
         if (e.target === this) cerrarModal();
+    });
+     // ── Notas ──────────────────────────────────────────────────
+    async function cargarNota() {
+        try {
+            const res = await fetch('/api/notas');
+            const data = await res.json();
+            if (data.texto) {
+                document.getElementById('notas-texto').value = data.texto;
+                document.getElementById('notas-estado').textContent = 'Última nota guardada ✓';
+            }
+        } catch {}
+    }
+ 
+    async function guardarNota() {
+        const texto = document.getElementById('notas-texto').value;
+        const estado = document.getElementById('notas-estado');
+        try {
+            await fetch('/api/notas', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ texto })
+            });
+            estado.textContent = '✓ Guardado';
+            estado.style.color = '#06d6a0';
+            setTimeout(() => { estado.textContent = ''; estado.style.color = ''; }, 2000);
+        } catch {
+            estado.textContent = 'Error al guardar';
+            estado.style.color = '#fc8181';
+        }
+    }
+ 
+    // Guardado automático al dejar de escribir
+    let notaTimer = null;
+    document.getElementById('notas-texto')?.addEventListener('input', () => {
+        clearTimeout(notaTimer);
+        document.getElementById('notas-estado').textContent = 'Escribiendo...';
+        notaTimer = setTimeout(guardarNota, 3000);
+    });
+ 
+    // ── Disponibilidad ─────────────────────────────────────────
+    const EMOJIS_TIPO = { dormir:'💤', estudiar:'📚', trabajar:'💼', ejercicio:'🏃', comer:'🍽', descanso:'🎮' };
+    const LABELS_TIPO = { dormir:'Dormir', estudiar:'Estudiar / Clases', trabajar:'Trabajar', ejercicio:'Ejercicio', comer:'Comer', descanso:'Descanso personal' };
+    const DIAS_ES = { todos:'Todos los días', lunes:'Lunes', martes:'Martes', miercoles:'Miércoles', jueves:'Jueves', viernes:'Viernes', sabado:'Sábado', domingo:'Domingo' };
+    let bloques = [];
+ 
+    async function cargarBloques() {
+        try {
+            const res = await fetch('/api/disponibilidad');
+            bloques = await res.json();
+            renderBloques();
+        } catch {}
+    }
+ 
+    function esBloqueActivo(b, diaActual, minActual) {
+        if (b.dia !== 'todos' && b.dia !== diaActual) return false;
+        const [hI, mI] = b.inicio.split(':').map(Number);
+        const [hF, mF] = b.fin.split(':').map(Number);
+        const minI = hI * 60 + mI, minF = hF * 60 + mF;
+        return minI > minF
+            ? (minActual >= minI || minActual <= minF)
+            : (minActual >= minI && minActual <= minF);
+    }
+ 
+    function renderBloques() {
+        const contenedor = document.getElementById('lista-bloques');
+        if (!bloques.length) {
+            contenedor.innerHTML = '<div class="sin-bloques">Todavía no tienes bloques de disponibilidad 🌙</div>';
+            return;
+        }
+        const ahora = new Date();
+        const diaActual = ['domingo','lunes','martes','miercoles','jueves','viernes','sabado'][ahora.getDay()];
+        const minActual = ahora.getHours() * 60 + ahora.getMinutes();
+        contenedor.innerHTML = '';
+        bloques.forEach((b, i) => {
+            const activo = esBloqueActivo(b, diaActual, minActual);
+            const div = document.createElement('div');
+            div.className = 'bloque-item';
+            div.innerHTML = `
+                <span class="bloque-emoji">${EMOJIS_TIPO[b.tipo] || '⏰'}</span>
+                <div class="bloque-info">
+                    <div class="bloque-titulo">
+                        ${activo ? '<span class="bloque-activo"></span>' : ''}
+                        ${LABELS_TIPO[b.tipo] || b.tipo}
+                        ${activo ? '<span style="font-size:11px;color:#06d6a0;font-weight:400"> · activo ahora</span>' : ''}
+                    </div>
+                    <div class="bloque-detalle">${DIAS_ES[b.dia] || b.dia} · ${b.inicio} – ${b.fin}</div>
+                </div>
+                <button class="btn-del-bloque" onclick="eliminarBloque(${i})">🗑</button>`;
+            contenedor.appendChild(div);
+        });
+    }
+ 
+    async function agregarBloque() {
+        const tipo   = document.getElementById('disp-tipo').value;
+        const dia    = document.getElementById('disp-dia').value;
+        const inicio = document.getElementById('disp-inicio').value;
+        const fin    = document.getElementById('disp-fin').value;
+        if (!inicio || !fin) return;
+        await fetch('/api/disponibilidad', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ tipo, dia, inicio, fin })
+        });
+        await cargarBloques();
+        actualizarIADisponibilidad();
+    }
+ 
+    async function eliminarBloque(index) {
+        await fetch(`/api/disponibilidad/${index}`, { method: 'DELETE' });
+        await cargarBloques();
+        actualizarIADisponibilidad();
+    }
+ 
+    async function actualizarIADisponibilidad() {
+        const el = document.getElementById('ia-mensaje');
+        try {
+            const res = await fetch('/api/disponibilidad/todos');
+            const todos = await res.json();
+            const ahora = new Date();
+            const diaActual = ['domingo','lunes','martes','miercoles','jueves','viernes','sabado'][ahora.getDay()];
+            const minActual = ahora.getHours() * 60 + ahora.getMinutes();
+            const ocupados = [], disponibles = [];
+            for (const [nombre, sus_bloques] of Object.entries(todos)) {
+                const activo = sus_bloques.find(b => esBloqueActivo(b, diaActual, minActual));
+                if (activo) ocupados.push(`${nombre} ${EMOJIS_TIPO[activo.tipo] || ''} ${LABELS_TIPO[activo.tipo]?.toLowerCase() || ''}`);
+                else disponibles.push(nombre);
+            }
+            let msg = '';
+            if (ocupados.length)    msg += ocupados.join(' · ') + '.  ';
+            if (disponibles.length) msg += `✅ Disponibles: ${disponibles.join(', ')}.`;
+            if (msg) el.textContent = msg;
+        } catch {}
+    }
+ 
+    // Cargar todo al iniciar
+    document.addEventListener('DOMContentLoaded', () => {
+        cargarNota();
+        cargarBloques();
+        actualizarIADisponibilidad();
     });
 </script>
 
