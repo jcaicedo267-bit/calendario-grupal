@@ -1,3 +1,26 @@
+:root {
+    --bg2:       rgba(19,16,34,0.6);
+    --bg3:       #1c1730;
+    --purple:    #7c5ce8;
+    --purple2:   #5b3fd4;
+    --border:    rgba(255,255,255,0.08);
+    --text:      #ffffff;
+    --text-dim:  rgba(255,255,255,0.45);
+    --text-faint:rgba(255,255,255,0.2);
+    --radius:    16px;
+    --font:      'Sour Gummy', sans-serif;
+}
+
+@keyframes popIn {
+    from { opacity: 0; transform: scale(0.92); }
+    to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -698,3 +721,147 @@ body {
     .form-bloque { grid-template-columns: 1fr 1fr; }
     .btn-agregar-bloque { grid-column: 1 / -1; }
 }
+
+/* ── Menú hamburguesa ── */
+        #btn-menu {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 8px;
+            padding: 7px 10px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            transition: background 0.2s;
+        }
+        #btn-menu:hover { background: rgba(255,255,255,0.07); }
+        #btn-menu span {
+            display: block;
+            width: 18px;
+            height: 2px;
+            background: rgba(255,255,255,0.7);
+            border-radius: 2px;
+        }
+
+        /* ── Panel perfil ── */
+        #panel-perfil {
+            display: none;
+            position: fixed;
+            top: 64px;
+            right: 20px;
+            width: 300px;
+            background: #1a1530;
+            border: 1px solid rgba(124,92,232,0.3);
+            border-radius: 20px;
+            padding: 24px;
+            z-index: 300;
+            box-shadow: 0 16px 60px rgba(0,0,0,0.6);
+            animation: popIn 0.2s ease;
+        }
+        #panel-perfil.visible { display: block; }
+
+        .perfil-avatar {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #5b3fd4, #7c5ce8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin: 0 auto 12px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid rgba(124,92,232,0.4);
+            transition: border-color 0.2s;
+        }
+        .perfil-avatar:hover { border-color: #7c5ce8; }
+        .perfil-avatar img { width:100%; height:100%; object-fit:cover; border-radius:50%; }
+        .perfil-avatar-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .perfil-avatar:hover .perfil-avatar-overlay { opacity: 1; }
+        #input-foto { display: none; }
+
+        .perfil-nombre {
+            text-align: center;
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .perfil-email {
+            text-align: center;
+            font-size: 11px;
+            color: rgba(255,255,255,0.45);
+            margin-bottom: 20px;
+        }
+        .perfil-separador {
+            height: 1px;
+            background: rgba(255,255,255,0.08);
+            margin-bottom: 16px;
+        }
+        .perfil-campo label {
+            display: block;
+            font-size: 10px;
+            color: rgba(255,255,255,0.2);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 5px;
+        }
+        .perfil-campo input {
+            width: 100%;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px;
+            padding: 9px 12px;
+            color: #fff;
+            font-size: 13px;
+            font-family: 'Sour Gummy', sans-serif;
+            outline: none;
+            margin-bottom: 12px;
+            transition: border-color 0.2s;
+        }
+        .perfil-campo input:focus { border-color: rgba(124,92,232,0.6); }
+        .perfil-campo input::placeholder { color: rgba(255,255,255,0.2); }
+        .btn-guardar-perfil {
+            width: 100%;
+            padding: 10px;
+            background: linear-gradient(135deg, #5b3fd4, #7c5ce8);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 13px;
+            font-family: 'Sour Gummy', sans-serif;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 4px;
+            transition: opacity 0.2s;
+        }
+        .btn-guardar-perfil:hover { opacity: 0.88; }
+        .perfil-msg {
+            font-size: 11px;
+            text-align: center;
+            margin-top: 8px;
+            min-height: 16px;
+            color: #06d6a0;
+        }
+
+        /* ── IA a la derecha ── */
+        #panel-ia {
+            position: fixed;
+            bottom: 24px;
+            right: 28px;
+            left: auto;
+            transform: none;
+            min-width: 280px;
+            max-width: 380px;
+        }

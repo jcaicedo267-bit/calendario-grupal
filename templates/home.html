@@ -513,6 +513,8 @@
         <div style="display:flex;align-items:center;gap:16px">
             <span id="saludo-usuario">Hola, {{ usuario }} 👋</span>
             <a href="/logout" class="btn-logout">Salir</a>
+             <span></span><span></span><span></span>
+    </button>
         </div>
     </div>
 </header>
@@ -660,6 +662,33 @@
             <button class="btn-cancelar-modal" onclick="cerrarModal()">Cancelar</button>
         </div>
     </div>
+</div>
+
+<!-- Panel perfil -->
+<div id="panel-perfil">
+    <input type="file" id="input-foto" accept="image/*" onchange="cambiarFoto(event)">
+    <div class="perfil-avatar" onclick="document.getElementById('input-foto').click()">
+        <span id="avatar-emoji">🌙</span>
+        <img id="avatar-img" src="" style="display:none">
+        <div class="perfil-avatar-overlay">📷</div>
+    </div>
+    <div class="perfil-nombre">{{ usuario }}</div>
+    <div class="perfil-email">Perfil de usuario</div>
+    <div class="perfil-separador"></div>
+    <div class="perfil-campo">
+        <label>Nuevo nombre de usuario</label>
+        <input type="text" id="input-nuevo-nombre" placeholder="Escribe tu nuevo nombre...">
+    </div>
+    <div class="perfil-campo">
+        <label>Nueva contraseña</label>
+        <input type="password" id="input-nueva-pass" placeholder="Nueva contraseña...">
+    </div>
+    <div class="perfil-campo">
+        <label>Confirmar contraseña</label>
+        <input type="password" id="input-confirmar-pass" placeholder="Repite la contraseña...">
+    </div>
+    <button class="btn-guardar-perfil" onclick="guardarPerfil()">Guardar cambios ✨</button>
+    <div class="perfil-msg" id="perfil-msg"></div>
 </div>
 
 <script>
@@ -993,6 +1022,76 @@
         cargarBloques();
         actualizarIADisponibilidad();
     });
+
+    // ── Menú perfil ──
+function togglePerfil() {
+    document.getElementById('panel-perfil').classList.toggle('visible');
+}
+document.addEventListener('click', function(e) {
+    const panel = document.getElementById('panel-perfil');
+    const btn = document.getElementById('btn-menu');
+    if (!panel.contains(e.target) && !btn.contains(e.target)) {
+        panel.classList.remove('visible');
+    }
+});
+
+function cambiarFoto(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+        document.getElementById('avatar-emoji').style.display = 'none';
+        const img = document.getElementById('avatar-img');
+        img.src = e.target.result;
+        img.style.display = 'block';
+        localStorage.setItem('lunefia_foto', e.target.result);
+    };
+    reader.readAsDataURL(file);
+}
+
+async function guardarPerfil() {
+    const nuevoNombre = document.getElementById('input-nuevo-nombre').value.trim();
+    const nuevaPass   = document.getElementById('input-nueva-pass').value;
+    const confirmar   = document.getElementById('input-confirmar-pass').value;
+    const msg         = document.getElementById('perfil-msg');
+
+    if (nuevaPass && nuevaPass !== confirmar) {
+        msg.style.color = '#fc8181';
+        msg.textContent = 'Las contraseñas no coinciden 💔';
+        return;
+    }
+    const res = await fetch('/api/perfil', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nuevo_nombre: nuevoNombre, nueva_pass: nuevaPass })
+    });
+    const data = await res.json();
+    if (data.ok) {
+        msg.style.color = '#06d6a0';
+        msg.textContent = '✓ Guardado correctamente';
+        if (nuevoNombre) {
+            document.getElementById('saludo').textContent = `Hola, ${nuevoNombre} 👋`;
+        }
+        setTimeout(() => {
+            msg.textContent = '';
+            document.getElementById('panel-perfil').classList.remove('visible');
+        }, 1500);
+    } else {
+        msg.style.color = '#fc8181';
+        msg.textContent = data.error || 'Error al guardar';
+    }
+}
+
+// Cargar foto guardada
+window.addEventListener('load', () => {
+    const foto = localStorage.getItem('lunefia_foto');
+    if (foto) {
+        document.getElementById('avatar-emoji').style.display = 'none';
+        const img = document.getElementById('avatar-img');
+        img.src = foto;
+        img.style.display = 'block';
+    }
+});
 </script>
 
 </body>

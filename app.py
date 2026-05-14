@@ -219,3 +219,28 @@ def manejar_notas():
 
 if __name__ == "__main__":
     app.run(debug=True)
+
+@app.route("/api/perfil", methods=["POST"])
+def actualizar_perfil():
+    redir = login_requerido()
+    if redir: return jsonify({"error": "no autenticado"}), 401
+    
+    usuario_viejo = usuario_actual()
+    datos = request.get_json()
+    nuevo_nombre = datos.get("nuevo_nombre", "").strip()
+    nueva_pass   = datos.get("nueva_pass", "").strip()
+    
+    usuarios = cargar_json(ARCHIVO_USUARIOS, {})
+    
+    if nuevo_nombre and nuevo_nombre != usuario_viejo:
+        if nuevo_nombre in usuarios:
+            return jsonify({"ok": False, "error": "Ese nombre ya existe 💔"})
+        usuarios[nuevo_nombre] = usuarios.pop(usuario_viejo)
+        session["usuario"] = nuevo_nombre
+        usuario_viejo = nuevo_nombre
+    
+    if nueva_pass:
+        usuarios[usuario_viejo] = nueva_pass
+    
+    guardar_json(ARCHIVO_USUARIOS, usuarios)
+    return jsonify({"ok": True})
