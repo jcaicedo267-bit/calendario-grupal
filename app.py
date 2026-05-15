@@ -2,16 +2,16 @@ from flask import Flask, render_template, request, jsonify, redirect, session
 import os
 import psycopg2
 from psycopg2.extras import RealDictCursor
-
+ 
 app = Flask(__name__)
 app.secret_key = "lunefia_secretkey_2026"
-
+ 
 DATABASE_URL = "postgresql://admin_lunefia:mhj46c94U8UPA6OeOZbb6TclASkZn0Pz@dpg-d83750lckfvc73bb451g-a.ohio-postgres.render.com/lunefia_db"
-
+ 
 def get_db():
     conn = psycopg2.connect(DATABASE_URL, cursor_factory=RealDictCursor)
     return conn
-
+ 
 def init_db():
     conn = get_db()
     cur = conn.cursor()
@@ -57,30 +57,30 @@ def init_db():
     conn.commit()
     cur.close()
     conn.close()
-
+ 
 with app.app_context():
     init_db()
-
+ 
 def usuario_actual():
     return session.get("usuario")
-
+ 
 def login_requerido():
     if not usuario_actual():
         return redirect("/login")
     return None
-
+ 
 @app.route("/")
 def inicio():
     redir = login_requerido()
     if redir: return redir
     return render_template("home.html", usuario=session.get("usuario"))
-
+ 
 @app.route("/calendario/<int:cal_id>")
 def ver_calendario(cal_id):
     redir = login_requerido()
     if redir: return redir
     return render_template("calendario.html", usuario=session.get("usuario"))
-
+ 
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
@@ -95,7 +95,7 @@ def login():
             return redirect("/")
         return render_template("login.html", error="Usuario o contraseña incorrectos 💔")
     return render_template("login.html")
-
+ 
 @app.route("/registro", methods=["GET", "POST"])
 def registro():
     if request.method == "POST":
@@ -115,19 +115,19 @@ def registro():
             cur.close(); conn.close()
             return render_template("registro.html", error="Ese usuario ya existe 💔")
     return render_template("registro.html")
-
+ 
 @app.route("/logout")
 def logout():
     session.clear()
     return redirect("/login")
-
+ 
 @app.route("/api/calendarios", methods=["GET", "POST"])
 def manejar_calendarios():
     redir = login_requerido()
     if redir: return jsonify({"error": "no autenticado"}), 401
     usuario = usuario_actual()
     conn = get_db(); cur = conn.cursor()
-
+ 
     if request.method == "POST":
         datos = request.get_json()
         cur.execute(
@@ -137,12 +137,12 @@ def manejar_calendarios():
         new_id = cur.fetchone()["id"]
         conn.commit(); cur.close(); conn.close()
         return jsonify({"mensaje": "Calendario guardado 💖", "id": new_id})
-
+ 
     cur.execute("SELECT * FROM calendarios WHERE tipo = 'grupal' OR dueno = %s", (usuario,))
     calendarios = cur.fetchall()
     cur.close(); conn.close()
     return jsonify([dict(c) for c in calendarios])
-
+ 
 @app.route("/api/calendarios/<int:cal_id>", methods=["DELETE"])
 def borrar_calendario(cal_id):
     redir = login_requerido()
@@ -160,14 +160,14 @@ def borrar_calendario(cal_id):
     cur.execute("DELETE FROM calendarios WHERE id = %s", (cal_id,))
     conn.commit(); cur.close(); conn.close()
     return jsonify({"mensaje": "Calendario eliminado"})
-
+ 
 @app.route("/api/eventos", methods=["GET", "POST"])
 def manejar_eventos():
     redir = login_requerido()
     if redir: return jsonify({"error": "no autenticado"}), 401
     usuario = usuario_actual()
     conn = get_db(); cur = conn.cursor()
-
+ 
     if request.method == "POST":
         e = request.get_json()
         cur.execute(
@@ -177,7 +177,7 @@ def manejar_eventos():
         )
         conn.commit(); cur.close(); conn.close()
         return jsonify({"mensaje": "Evento guardado correctamente"}), 201
-
+ 
     cal_id = request.args.get("calendario")
     if cal_id:
         cur.execute("SELECT * FROM calendarios WHERE id = %s", (cal_id,))
@@ -198,10 +198,10 @@ def manejar_eventos():
         else:
             cur.execute("SELECT * FROM eventos WHERE dueno = %s", (usuario,))
         resultado = cur.fetchall()
-
+ 
     cur.close(); conn.close()
     return jsonify([dict(e) for e in resultado])
-
+ 
 @app.route("/api/eventos/borrar", methods=["POST"])
 def borrar_evento():
     redir = login_requerido()
@@ -212,14 +212,14 @@ def borrar_evento():
     cur.execute("DELETE FROM eventos WHERE title = %s AND dueno = %s", (datos.get("titulo"), usuario))
     conn.commit(); cur.close(); conn.close()
     return jsonify({"mensaje": "Evento eliminado"})
-
+ 
 @app.route("/api/notas", methods=["GET", "POST"])
 def manejar_notas():
     redir = login_requerido()
     if redir: return jsonify({"error": "no autenticado"}), 401
     usuario = usuario_actual()
     conn = get_db(); cur = conn.cursor()
-
+ 
     if request.method == "POST":
         datos = request.get_json()
         cur.execute(
@@ -229,33 +229,38 @@ def manejar_notas():
         )
         conn.commit(); cur.close(); conn.close()
         return jsonify({"mensaje": "Nota guardada ✨"})
-
+ 
     cal_id = request.args.get("calendario")
     cur.execute("SELECT texto FROM notas WHERE usuario = %s AND calendario = %s", (usuario, cal_id))
     nota = cur.fetchone()
     cur.close(); conn.close()
     return jsonify({"texto": nota["texto"] if nota else ""})
-
+ 
 @app.route("/api/disponibilidad", methods=["GET", "POST", "DELETE"])
 def manejar_disponibilidad():
     redir = login_requerido()
     if redir: return jsonify({"error": "no autenticado"}), 401
     usuario = usuario_actual()
     conn = get_db(); cur = conn.cursor()
-
+ 
     if request.method == "POST":
         d = request.get_json()
-        # Guarda con los nombres del frontend (tipo, inicio, fin)
+        actividad = d.get("tipo")
+        dia = d.get("dia")
+        inicio = d.get("inicio")
+        fin = d.get("fin")
+        if not actividad or not inicio or not fin:
+            cur.close(); conn.close()
+            return jsonify({"error": "Faltan campos"}), 400
         cur.execute(
             "INSERT INTO disponibilidad (usuario, actividad, dia, desde, hasta) VALUES (%s,%s,%s,%s,%s)",
-            (usuario, d.get("tipo"), d.get("dia"), d.get("inicio"), d.get("fin"))
+            (usuario, actividad, dia, inicio, fin)
         )
         conn.commit(); cur.close(); conn.close()
         return jsonify({"mensaje": "Disponibilidad guardada ✨"})
-
+ 
     if request.method == "DELETE":
         d = request.get_json()
-        # El frontend manda el índice de la lista, borramos por posición
         cur.execute("SELECT id FROM disponibilidad WHERE usuario = %s ORDER BY id", (usuario,))
         ids = [r["id"] for r in cur.fetchall()]
         idx = d.get("id")
@@ -263,8 +268,7 @@ def manejar_disponibilidad():
             cur.execute("DELETE FROM disponibilidad WHERE id = %s", (ids[idx],))
         conn.commit(); cur.close(); conn.close()
         return jsonify({"mensaje": "Eliminado"})
-
-    # GET: devuelve con los nombres que espera el frontend
+ 
     cur.execute("SELECT * FROM disponibilidad WHERE usuario = %s", (usuario,))
     filas = cur.fetchall()
     cur.close(); conn.close()
@@ -274,10 +278,9 @@ def manejar_disponibilidad():
         "inicio": f["desde"],
         "fin": f["hasta"]
     } for f in filas])
-
+ 
 @app.route("/api/disponibilidad/<nombre_usuario>", methods=["GET"])
 def disponibilidad_de(nombre_usuario):
-    # Para consultar disponibilidad de integrantes al crear calendario grupal
     redir = login_requerido()
     if redir: return jsonify({"error": "no autenticado"}), 401
     conn = get_db(); cur = conn.cursor()
@@ -290,7 +293,7 @@ def disponibilidad_de(nombre_usuario):
         "inicio": f["desde"],
         "fin": f["hasta"]
     } for f in filas])
-
+ 
 @app.route("/api/perfil", methods=["POST"])
 def actualizar_perfil():
     redir = login_requerido()
@@ -300,7 +303,7 @@ def actualizar_perfil():
     nuevo_nombre = datos.get("nuevo_nombre", "").strip()
     nueva_pass   = datos.get("nueva_pass", "").strip()
     conn = get_db(); cur = conn.cursor()
-
+ 
     if nuevo_nombre and nuevo_nombre != usuario_viejo:
         cur.execute("SELECT nombre FROM usuarios WHERE nombre = %s", (nuevo_nombre,))
         if cur.fetchone():
@@ -309,12 +312,22 @@ def actualizar_perfil():
         cur.execute("UPDATE usuarios SET nombre = %s WHERE nombre = %s", (nuevo_nombre, usuario_viejo))
         session["usuario"] = nuevo_nombre
         usuario_viejo = nuevo_nombre
-
+ 
     if nueva_pass:
         cur.execute("UPDATE usuarios SET contrasena = %s WHERE nombre = %s", (nueva_pass, usuario_viejo))
-
+ 
     conn.commit(); cur.close(); conn.close()
     return jsonify({"ok": True})
-
+ 
+@app.route("/limpiar-db")
+def limpiar_db():
+    conn = get_db(); cur = conn.cursor()
+    cur.execute("DELETE FROM disponibilidad WHERE actividad IS NULL OR desde IS NULL OR hasta IS NULL")
+    conn.commit()
+    count = cur.rowcount
+    cur.close(); conn.close()
+    return f"Eliminados {count} registros corruptos ✓"
+ 
 if __name__ == "__main__":
     app.run(debug=True)
+ 
