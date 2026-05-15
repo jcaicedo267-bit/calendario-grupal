@@ -147,7 +147,7 @@ def manejar_calendarios():
     cur.execute("""
                 SELECT * FROM calendarios
                 WHERE dueno =  %s
-                OR (tipo = 'grupal', AND integrantes LIKE %s)
+                OR (tipo = 'grupal' AND integrantes LIKE %s)
                 """, (usuario, f"%{usuario}%"))
     calendarios = cur.fetchall()
     cur.close(); conn.close()
