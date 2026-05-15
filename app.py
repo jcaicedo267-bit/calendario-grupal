@@ -6,7 +6,6 @@ from psycopg2.extras import RealDictCursor
 app = Flask(__name__)
 app.secret_key = "lunefia_secretkey_2026"
 
-# Tu base de datos en Render
 DATABASE_URL = "postgresql://admin_lunefia:mhj46c94U8UPA6OeOZbb6TclASkZn0Pz@dpg-d83750lckfvc73bb451g-a.ohio-postgres.render.com/lunefia_db"
 
 def get_db():
@@ -55,16 +54,13 @@ def init_db():
             hasta TEXT
         );
     """)
-    # ↑ tabla nueva para guardar horas bloqueadas de cada usuaria
     conn.commit()
     cur.close()
     conn.close()
 
-# Crea todas las tablas al arrancar la app
 with app.app_context():
     init_db()
 
-# -------- HELPERS --------
 def usuario_actual():
     return session.get("usuario")
 
@@ -73,7 +69,6 @@ def login_requerido():
         return redirect("/login")
     return None
 
-# -------- PÁGINAS --------
 @app.route("/")
 def inicio():
     redir = login_requerido()
@@ -86,7 +81,6 @@ def ver_calendario(cal_id):
     if redir: return redir
     return render_template("calendario.html", usuario=session.get("usuario"))
 
-# -------- AUTH --------
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
@@ -127,7 +121,6 @@ def logout():
     session.clear()
     return redirect("/login")
 
-# -------- CALENDARIOS --------
 @app.route("/api/calendarios", methods=["GET", "POST"])
 def manejar_calendarios():
     redir = login_requerido()
@@ -145,9 +138,7 @@ def manejar_calendarios():
         conn.commit(); cur.close(); conn.close()
         return jsonify({"mensaje": "Calendario guardado 💖", "id": new_id})
 
-    cur.execute(
-        "SELECT * FROM calendarios WHERE tipo = 'grupal' OR dueno = %s", (usuario,)
-    )
+    cur.execute("SELECT * FROM calendarios WHERE tipo = 'grupal' OR dueno = %s", (usuario,))
     calendarios = cur.fetchall()
     cur.close(); conn.close()
     return jsonify([dict(c) for c in calendarios])
@@ -170,7 +161,6 @@ def borrar_calendario(cal_id):
     conn.commit(); cur.close(); conn.close()
     return jsonify({"mensaje": "Calendario eliminado"})
 
-# -------- EVENTOS --------
 @app.route("/api/eventos", methods=["GET", "POST"])
 def manejar_eventos():
     redir = login_requerido()
@@ -194,10 +184,8 @@ def manejar_eventos():
         cal = cur.fetchone()
         if cal:
             if cal["tipo"] == "grupal":
-                # Calendario grupal: todas ven todos los eventos
                 cur.execute("SELECT * FROM eventos WHERE calendario = %s", (cal_id,))
             else:
-                # Calendario personal: solo los tuyos
                 cur.execute("SELECT * FROM eventos WHERE calendario = %s AND dueno = %s", (cal_id, usuario))
             resultado = cur.fetchall()
         else:
@@ -206,10 +194,7 @@ def manejar_eventos():
         cur.execute("SELECT id FROM calendarios WHERE tipo = 'grupal'")
         grupales = [str(r["id"]) for r in cur.fetchall()]
         if grupales:
-            cur.execute(
-                "SELECT * FROM eventos WHERE dueno = %s OR calendario::text = ANY(%s)",
-                (usuario, grupales)
-            )
+            cur.execute("SELECT * FROM eventos WHERE dueno = %s OR calendario::text = ANY(%s)", (usuario, grupales))
         else:
             cur.execute("SELECT * FROM eventos WHERE dueno = %s", (usuario,))
         resultado = cur.fetchall()
@@ -228,7 +213,6 @@ def borrar_evento():
     conn.commit(); cur.close(); conn.close()
     return jsonify({"mensaje": "Evento eliminado"})
 
-# -------- NOTAS --------
 @app.route("/api/notas", methods=["GET", "POST"])
 def manejar_notas():
     redir = login_requerido()
@@ -252,7 +236,6 @@ def manejar_notas():
     cur.close(); conn.close()
     return jsonify({"texto": nota["texto"] if nota else ""})
 
-# -------- DISPONIBILIDAD (NUEVO) --------
 @app.route("/api/disponibilidad", methods=["GET", "POST", "DELETE"])
 def manejar_disponibilidad():
     redir = login_requerido()
@@ -261,41 +244,53 @@ def manejar_disponibilidad():
     conn = get_db(); cur = conn.cursor()
 
     if request.method == "POST":
-        # Guardar una hora bloqueada de la usuaria actual
         d = request.get_json()
+        # Guarda con los nombres del frontend (tipo, inicio, fin)
         cur.execute(
             "INSERT INTO disponibilidad (usuario, actividad, dia, desde, hasta) VALUES (%s,%s,%s,%s,%s)",
-            (usuario, d.get("actividad"), d.get("dia"), d.get("desde"), d.get("hasta"))
+            (usuario, d.get("tipo"), d.get("dia"), d.get("inicio"), d.get("fin"))
         )
         conn.commit(); cur.close(); conn.close()
         return jsonify({"mensaje": "Disponibilidad guardada ✨"})
 
     if request.method == "DELETE":
-        # Borrar una hora bloqueada por su id
         d = request.get_json()
-        cur.execute("DELETE FROM disponibilidad WHERE id = %s AND usuario = %s", (d.get("id"), usuario))
+        # El frontend manda el índice de la lista, borramos por posición
+        cur.execute("SELECT id FROM disponibilidad WHERE usuario = %s ORDER BY id", (usuario,))
+        ids = [r["id"] for r in cur.fetchall()]
+        idx = d.get("id")
+        if idx is not None and idx < len(ids):
+            cur.execute("DELETE FROM disponibilidad WHERE id = %s", (ids[idx],))
         conn.commit(); cur.close(); conn.close()
         return jsonify({"mensaje": "Eliminado"})
 
-    # GET: devolver todas las horas bloqueadas de la usuaria actual
+    # GET: devuelve con los nombres que espera el frontend
     cur.execute("SELECT * FROM disponibilidad WHERE usuario = %s", (usuario,))
     filas = cur.fetchall()
     cur.close(); conn.close()
-    return jsonify([dict(f) for f in filas])
-
+    return jsonify([{
+        "tipo": f["actividad"],
+        "dia": f["dia"],
+        "inicio": f["desde"],
+        "fin": f["hasta"]
+    } for f in filas])
 
 @app.route("/api/disponibilidad/<nombre_usuario>", methods=["GET"])
 def disponibilidad_de(nombre_usuario):
-    # Consultar horas bloqueadas de otra usuaria (para mostrar al crear calendario grupal)
+    # Para consultar disponibilidad de integrantes al crear calendario grupal
     redir = login_requerido()
     if redir: return jsonify({"error": "no autenticado"}), 401
     conn = get_db(); cur = conn.cursor()
     cur.execute("SELECT * FROM disponibilidad WHERE usuario = %s", (nombre_usuario,))
     filas = cur.fetchall()
     cur.close(); conn.close()
-    return jsonify([dict(f) for f in filas])
+    return jsonify([{
+        "tipo": f["actividad"],
+        "dia": f["dia"],
+        "inicio": f["desde"],
+        "fin": f["hasta"]
+    } for f in filas])
 
-# -------- PERFIL --------
 @app.route("/api/perfil", methods=["POST"])
 def actualizar_perfil():
     redir = login_requerido()
