@@ -166,8 +166,10 @@
         <input type="text" id="titulo" placeholder="Nombre del evento">
         <label>Fecha:</label>
         <input type="date" id="fecha">
-        <label>Hora:</label>
-        <input type="time" id="hora">
+        <label>Hora de inicio:</label>
+        <input type="time" id="hora-inicio">
+        <label>Hora de finalización:</label>
+        <input type="time" id="hora-final">
         <label>Materia:</label>
         <input type="text" id="materia" placeholder="Ej: Biología, Matemáticas...">
         <label>Tipo:</label>
@@ -276,13 +278,14 @@
         async function guardarEvento() {
             const titulo  = document.getElementById('titulo').value;
             const fecha   = document.getElementById('fecha').value;
-            const hora    = document.getElementById('hora').value;
+            const horaInicio = document.getElementById('hora-inicio').value;
+            const horaFin   = document.getElementById('hora-fin').value;
             const tipo    = document.getElementById('tipo').value;
             const materia = document.getElementById('materia').value;
             await fetch('/api/eventos', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ title: titulo, start: fecha + 'T' + hora, tipo, materia, calendario: calId })
+                body: JSON.stringify({ title: titulo, start: fecha + 'T' + horaInicio, end: fecha + 'T' + horaFin, tipo, materia, calendario: calId })
             });
             togglePanel();
             location.reload();

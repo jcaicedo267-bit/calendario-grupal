@@ -944,3 +944,6 @@ body::before {
     background: rgba(124,92,232,0.3) !important;
     border-color: rgba(124,92,232,0.5) !important;
 }
+
+.fc-icon-chevron-left::before  { content: '‹' !important; font-size: 18px; }
+.fc-icon-chevron-right::before { content: '›' !important; font-size: 18px; }

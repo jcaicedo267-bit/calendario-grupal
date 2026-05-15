@@ -430,7 +430,16 @@
     function filtrarCalendarios() { renderCalendarios(todosLosCalendarios); }
     function cambiarTab(btn, tipo) { document.querySelectorAll('.tab').forEach(t => t.classList.remove('activo')); btn.classList.add('activo'); tabActual = tipo; renderCalendarios(todosLosCalendarios); }
     function abrirCalendario(id) { window.location.href = `/calendario/${id}`; }
-    async function borrarCalendario(id, e) { e.stopPropagation(); if (!confirm('¿Borrar este calendario?')) return; await fetch(`/api/calendarios/${id}`, { method: 'DELETE' }); await cargarCalendarios(); }
+    async function borrarCalendario(id, e) {
+        e.stopPropagation();
+        const modal = document.getElementById('modal-borrar-cal');
+        modal.style.display = 'flex';
+        document.getElementById('modal-borrar-cal-confirmar').onclick = async function() {
+            modal.style.display = 'none';
+            await fetch(`/api/calendarios/${id}`, { method: 'DELETE' });
+            await cargarCalendarios();
+    };
+}
 
     // ── Modal ────────────────────────────────────────────────────────────────
     function abrirModal(tipo) { tipoSeleccionado = tipo; actualizarTipoModal(); document.getElementById('modal-crear').classList.add('visible'); setTimeout(() => document.getElementById('modal-nombre').focus(), 100); }
@@ -541,5 +550,14 @@
         const foto = localStorage.getItem('lunefia_foto'); if (foto) { document.getElementById('avatar-emoji').style.display = 'none'; const img = document.getElementById('avatar-img'); img.src = foto; img.style.display = 'block'; }
     });
 </script>
+<div id="modal-borrar-cal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(6px); z-index:500; align-items:center; justify-content:center;">
+    <div style="background:#1a1530; border:1px solid rgba(124,92,232,0.3); border-radius:20px; padding:28px; width:100%; max-width:340px; text-align:center; box-shadow:0 24px 80px rgba(0,0,0,0.6);">
+        <p style="font-size:15px; margin-bottom:20px; color:#fff;">¿Borrar este calendario?</p>
+        <div style="display:flex; gap:10px;">
+            <button id="modal-borrar-cal-confirmar" style="flex:1; padding:10px; background:linear-gradient(135deg,#c0392b,#e74c3c); border:none; border-radius:10px; color:white; font-size:13px; font-family:var(--font); cursor:pointer;">🗑 Borrar</button>
+            <button onclick="document.getElementById('modal-borrar-cal').style.display='none'" style="flex:1; padding:10px; background:transparent; border:1px solid rgba(255,255,255,0.12); border-radius:10px; color:rgba(255,255,255,0.7); font-size:13px; font-family:var(--font); cursor:pointer;">Cancelar</button>
+        </div>
+    </div>
+</div>
 </body>
 </html>
