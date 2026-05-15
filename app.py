@@ -144,7 +144,11 @@ def manejar_calendarios():
         conn.commit(); cur.close(); conn.close()
         return jsonify({"mensaje": "Calendario guardado 💖", "id": new_id})
 
-    cur.execute("SELECT * FROM calendarios WHERE tipo = 'grupal' OR dueno = %s", (usuario,))
+    cur.execute("""
+                SELECT * FROM calendarios
+                WHERE dueno =  %s
+                OR (tipo = 'grupal'", AND integrantes LIKE %s)
+                """, (usuario, f"%{usuario}%"))
     calendarios = cur.fetchall()
     cur.close(); conn.close()
     return jsonify([dict(c) for c in calendarios])

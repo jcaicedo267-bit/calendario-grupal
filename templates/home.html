@@ -439,7 +439,7 @@
     function actualizarTipoModal() { document.getElementById('tipo-personal').classList.toggle('sel', tipoSeleccionado === 'personal'); document.getElementById('tipo-grupal').classList.toggle('sel', tipoSeleccionado === 'grupal'); }
     async function confirmarCrear() {
         const n = document.getElementById('modal-nombre').value.trim(); if (!n) { document.getElementById('modal-nombre').focus(); return; }
-        await fetch('/api/calendarios', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nombre: n, tipo: tipoSeleccionado }) });
+        await fetch('/api/calendarios', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nombre: n, tipo: tipoSeleccionado, integrantes: tipoSeleccionado === 'grupal' ? ['{{ usuario }}'] : [] }) });
         cerrarModal(); await cargarCalendarios();
     }
 
