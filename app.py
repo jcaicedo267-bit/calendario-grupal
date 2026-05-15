@@ -6,6 +6,7 @@ from psycopg2.extras import RealDictCursor
 app = Flask(__name__)
 app.secret_key = "lunefia_secretkey_2026"
 
+# Tu base de datos en Render
 DATABASE_URL = "postgresql://admin_lunefia:mhj46c94U8UPA6OeOZbb6TclASkZn0Pz@dpg-d83750lckfvc73bb451g-a.ohio-postgres.render.com/lunefia_db"
 
 def get_db():
@@ -45,12 +46,21 @@ def init_db():
             texto TEXT,
             UNIQUE(usuario, calendario)
         );
+        CREATE TABLE IF NOT EXISTS disponibilidad (
+            id SERIAL PRIMARY KEY,
+            usuario TEXT,
+            actividad TEXT,
+            dia TEXT,
+            desde TEXT,
+            hasta TEXT
+        );
     """)
+    # ↑ tabla nueva para guardar horas bloqueadas de cada usuaria
     conn.commit()
     cur.close()
     conn.close()
 
-# Llama init_db al arrancar
+# Crea todas las tablas al arrancar la app
 with app.app_context():
     init_db()
 
@@ -171,7 +181,7 @@ def manejar_eventos():
     if request.method == "POST":
         e = request.get_json()
         cur.execute(
-            "INSERT INTO eventos (title, start, \"end\", calendario, dueno, materia, modalidad, partes) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
+            "INSERT INTO eventos (title, start, end_time, calendario, dueno, materia, modalidad, partes) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
             (e.get("title"), e.get("start"), e.get("end"), e.get("calendario"), usuario,
              e.get("materia"), e.get("modalidad"), e.get("partes"))
         )
@@ -184,8 +194,10 @@ def manejar_eventos():
         cal = cur.fetchone()
         if cal:
             if cal["tipo"] == "grupal":
+                # Calendario grupal: todas ven todos los eventos
                 cur.execute("SELECT * FROM eventos WHERE calendario = %s", (cal_id,))
             else:
+                # Calendario personal: solo los tuyos
                 cur.execute("SELECT * FROM eventos WHERE calendario = %s AND dueno = %s", (cal_id, usuario))
             resultado = cur.fetchall()
         else:
@@ -195,7 +207,7 @@ def manejar_eventos():
         grupales = [str(r["id"]) for r in cur.fetchall()]
         if grupales:
             cur.execute(
-                f"SELECT * FROM eventos WHERE dueno = %s OR calendario::text = ANY(%s)",
+                "SELECT * FROM eventos WHERE dueno = %s OR calendario::text = ANY(%s)",
                 (usuario, grupales)
             )
         else:
@@ -239,6 +251,49 @@ def manejar_notas():
     nota = cur.fetchone()
     cur.close(); conn.close()
     return jsonify({"texto": nota["texto"] if nota else ""})
+
+# -------- DISPONIBILIDAD (NUEVO) --------
+@app.route("/api/disponibilidad", methods=["GET", "POST", "DELETE"])
+def manejar_disponibilidad():
+    redir = login_requerido()
+    if redir: return jsonify({"error": "no autenticado"}), 401
+    usuario = usuario_actual()
+    conn = get_db(); cur = conn.cursor()
+
+    if request.method == "POST":
+        # Guardar una hora bloqueada de la usuaria actual
+        d = request.get_json()
+        cur.execute(
+            "INSERT INTO disponibilidad (usuario, actividad, dia, desde, hasta) VALUES (%s,%s,%s,%s,%s)",
+            (usuario, d.get("actividad"), d.get("dia"), d.get("desde"), d.get("hasta"))
+        )
+        conn.commit(); cur.close(); conn.close()
+        return jsonify({"mensaje": "Disponibilidad guardada ✨"})
+
+    if request.method == "DELETE":
+        # Borrar una hora bloqueada por su id
+        d = request.get_json()
+        cur.execute("DELETE FROM disponibilidad WHERE id = %s AND usuario = %s", (d.get("id"), usuario))
+        conn.commit(); cur.close(); conn.close()
+        return jsonify({"mensaje": "Eliminado"})
+
+    # GET: devolver todas las horas bloqueadas de la usuaria actual
+    cur.execute("SELECT * FROM disponibilidad WHERE usuario = %s", (usuario,))
+    filas = cur.fetchall()
+    cur.close(); conn.close()
+    return jsonify([dict(f) for f in filas])
+
+
+@app.route("/api/disponibilidad/<nombre_usuario>", methods=["GET"])
+def disponibilidad_de(nombre_usuario):
+    # Consultar horas bloqueadas de otra usuaria (para mostrar al crear calendario grupal)
+    redir = login_requerido()
+    if redir: return jsonify({"error": "no autenticado"}), 401
+    conn = get_db(); cur = conn.cursor()
+    cur.execute("SELECT * FROM disponibilidad WHERE usuario = %s", (nombre_usuario,))
+    filas = cur.fetchall()
+    cur.close(); conn.close()
+    return jsonify([dict(f) for f in filas])
 
 # -------- PERFIL --------
 @app.route("/api/perfil", methods=["POST"])
