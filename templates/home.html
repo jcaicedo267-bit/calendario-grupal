@@ -378,11 +378,11 @@
 <script>
     let tabActual = 'todos', tipoSeleccionado = 'personal', todosLosCalendarios = [], notaTimer = null, bloques = [];
 
-    const EMOJIS_TIPO = {dormir:'💤',estudiar:'📚',trabajar:'💼',ejercicio:'🏃',comer:'🍽',descanso:'🎮'};
-    const LABELS_TIPO = {dormir:'Dormir',estudiar:'Estudiar / Clases',trabajar:'Trabajar',ejercicio:'Ejercicio',comer:'Comer',descanso:'Descanso personal'};
-    const DIAS_ES = {todos:'Todos los días',lunes:'Lunes',martes:'Martes',miercoles:'Miércoles',jueves:'Jueves',viernes:'Viernes',sabado:'Sábado',domingo:'Domingo'};
+    const EMOJIS_TIPO  = { dormir:'💤', estudiar:'📚', trabajar:'💼', ejercicio:'🏃', comer:'🍽', descanso:'🎮' };
+    const LABELS_TIPO  = { dormir:'Dormir', estudiar:'Estudiar / Clases', trabajar:'Trabajar', ejercicio:'Ejercicio', comer:'Comer', descanso:'Descanso personal' };
+    const DIAS_ES      = { todos:'Todos los días', lunes:'Lunes', martes:'Martes', miercoles:'Miércoles', jueves:'Jueves', viernes:'Viernes', sabado:'Sábado', domingo:'Domingo' };
 
-    // ── IA ──
+    // ── IA ──────────────────────────────────────────────────────────────────
     async function cargarMensajeIA() {
         const el = document.getElementById('ia-mensaje');
         try {
@@ -392,115 +392,153 @@
             for (const cal of lista) {
                 try { proximos = proximos.concat(await (await fetch(`/api/eventos?calendario=${cal.id}`)).json()); } catch {}
             }
-            const hoy = new Date(), en3 = new Date(); en3.setDate(hoy.getDate()+3);
-            proximos = proximos.filter(ev => { const f=new Date(ev.start); return f>=hoy&&f<=en3; });
-            if (!proximos.length) { el.textContent=`¡Todo tranquilo! Tienes ${lista.length} calendario${lista.length>1?'s':''} activo${lista.length>1?'s':''} 🌙`; return; }
-            proximos.sort((a,b)=>new Date(a.start)-new Date(b.start));
-            const s=proximos[0], dias=Math.ceil((new Date(s.start)-hoy)/(864e5)), e={tarea:'📘',examen:'📕',proyecto:'📗'}[s.tipo]||'📅';
-            el.textContent = dias===0?`${e} ¡Hoy tienes "${s.title}"! 💪`:dias===1?`${e} Mañana tienes "${s.title}". ¡Ya casi!`:`${e} En ${dias} días: "${s.title}". ¡Prepárate!`;
-            if (proximos.length>1) el.textContent+=` (+${proximos.length-1} más)`;
-        } catch { el.textContent='¡Hola! Soy Lunefia IA 🌟'; }
+            const hoy = new Date(), en3 = new Date(); en3.setDate(hoy.getDate() + 3);
+            proximos = proximos.filter(ev => { const f = new Date(ev.start); return f >= hoy && f <= en3; });
+            if (!proximos.length) { el.textContent = `¡Todo tranquilo! Tienes ${lista.length} calendario${lista.length > 1 ? 's' : ''} activo${lista.length > 1 ? 's' : ''} 🌙`; return; }
+            proximos.sort((a, b) => new Date(a.start) - new Date(b.start));
+            const s = proximos[0], dias = Math.ceil((new Date(s.start) - hoy) / 864e5), e = { tarea:'📘', examen:'📕', proyecto:'📗' }[s.tipo] || '📅';
+            el.textContent = dias === 0 ? `${e} ¡Hoy tienes "${s.title}"! 💪` : dias === 1 ? `${e} Mañana tienes "${s.title}". ¡Ya casi!` : `${e} En ${dias} días: "${s.title}". ¡Prepárate!`;
+            if (proximos.length > 1) el.textContent += ` (+${proximos.length - 1} más)`;
+        } catch { el.textContent = '¡Hola! Soy Lunefia IA 🌟'; }
     }
 
     function mostrarMotivacion() {
-        const m=["✨ Tú puedes con todo hoy 💖","🌸 Cada pequeño avance cuenta","💪 ¡Vas increíble!","📚 Un paso más cerca de tus metas","🌷 Confía en tu proceso","⭐ Hoy es un buen día","💕 Lo estás haciendo muy bien"];
-        document.getElementById("mensaje-motivacional").textContent=m[Math.floor(Math.random()*m.length)];
+        const m = ["✨ Tú puedes con todo hoy 💖","🌸 Cada pequeño avance cuenta","💪 ¡Vas increíble!","📚 Un paso más cerca de tus metas","🌷 Confía en tu proceso","⭐ Hoy es un buen día","💕 Lo estás haciendo muy bien"];
+        document.getElementById("mensaje-motivacional").textContent = m[Math.floor(Math.random() * m.length)];
     }
 
-    // ── Calendarios ──
+    // ── Calendarios ─────────────────────────────────────────────────────────
     async function cargarCalendarios() {
-        try { todosLosCalendarios=await (await fetch('/api/calendarios')).json(); renderCalendarios(todosLosCalendarios); } catch { renderCalendarios([]); }
+        try { todosLosCalendarios = await (await fetch('/api/calendarios')).json(); renderCalendarios(todosLosCalendarios); } catch { renderCalendarios([]); }
     }
     function renderCalendarios(lista) {
-        const c=document.getElementById('calendarios-lista');
-        const filtro=tabActual==='todos'?lista:lista.filter(x=>x.tipo===tabActual);
-        const b=document.getElementById('buscador').value.toLowerCase();
-        const final=b?filtro.filter(x=>x.nombre.toLowerCase().includes(b)):filtro;
-        if (!final.length) { c.innerHTML='<div class="vacio"><span>🌙</span><p>Todavía no tienes calendarios aquí.<br>¡Crea uno arriba para empezar!</p></div>'; return; }
-        c.innerHTML='';
-        final.forEach((x,i)=>{
-            const card=document.createElement('div'); card.className='cal-card'; card.style.animationDelay=`${i*0.05}s`;
-            const g=x.tipo==='grupal';
-            card.innerHTML=`<div class="cal-card-top"><div class="cal-icono ${x.tipo}">${g?'👥':'🗓'}</div><span class="cal-badge ${x.tipo}">${x.tipo}</span></div>
-                <div><strong>${x.nombre}</strong><small>${g?'Calendario grupal':'Calendario personal'}</small></div>
+        const c = document.getElementById('calendarios-lista');
+        const filtro = tabActual === 'todos' ? lista : lista.filter(x => x.tipo === tabActual);
+        const b = document.getElementById('buscador').value.toLowerCase();
+        const final = b ? filtro.filter(x => x.nombre.toLowerCase().includes(b)) : filtro;
+        if (!final.length) { c.innerHTML = '<div class="vacio"><span>🌙</span><p>Todavía no tienes calendarios aquí.<br>¡Crea uno arriba para empezar!</p></div>'; return; }
+        c.innerHTML = '';
+        final.forEach((x, i) => {
+            const card = document.createElement('div'); card.className = 'cal-card'; card.style.animationDelay = `${i * 0.05}s`;
+            const g = x.tipo === 'grupal';
+            card.innerHTML = `<div class="cal-card-top"><div class="cal-icono ${x.tipo}">${g ? '👥' : '🗓'}</div><span class="cal-badge ${x.tipo}">${x.tipo}</span></div>
+                <div><strong>${x.nombre}</strong><small>${g ? 'Calendario grupal' : 'Calendario personal'}</small></div>
                 <div class="cal-card-footer"><button type="button" class="btn-abrir" onclick="abrirCalendario('${x.id}')">Abrir →</button><button type="button" class="btn-borrar-cal" onclick="borrarCalendario('${x.id}',event)">🗑</button></div>`;
             c.appendChild(card);
         });
     }
     function filtrarCalendarios() { renderCalendarios(todosLosCalendarios); }
-    function cambiarTab(btn,tipo) { document.querySelectorAll('.tab').forEach(t=>t.classList.remove('activo')); btn.classList.add('activo'); tabActual=tipo; renderCalendarios(todosLosCalendarios); }
-    function abrirCalendario(id) { window.location.href=`/calendario/${id}`; }
-    async function borrarCalendario(id,e) { e.stopPropagation(); if(!confirm('¿Borrar este calendario?'))return; await fetch(`/api/calendarios/${id}`,{method:'DELETE'}); await cargarCalendarios(); }
+    function cambiarTab(btn, tipo) { document.querySelectorAll('.tab').forEach(t => t.classList.remove('activo')); btn.classList.add('activo'); tabActual = tipo; renderCalendarios(todosLosCalendarios); }
+    function abrirCalendario(id) { window.location.href = `/calendario/${id}`; }
+    async function borrarCalendario(id, e) { e.stopPropagation(); if (!confirm('¿Borrar este calendario?')) return; await fetch(`/api/calendarios/${id}`, { method: 'DELETE' }); await cargarCalendarios(); }
 
-    // ── Modal ──
-    function abrirModal(tipo) { tipoSeleccionado=tipo; actualizarTipoModal(); document.getElementById('modal-crear').classList.add('visible'); setTimeout(()=>document.getElementById('modal-nombre').focus(),100); }
-    function cerrarModal() { document.getElementById('modal-crear').classList.remove('visible'); document.getElementById('modal-nombre').value=''; }
-    function selTipo(tipo) { tipoSeleccionado=tipo; actualizarTipoModal(); }
-    function actualizarTipoModal() { document.getElementById('tipo-personal').classList.toggle('sel',tipoSeleccionado==='personal'); document.getElementById('tipo-grupal').classList.toggle('sel',tipoSeleccionado==='grupal'); }
+    // ── Modal ────────────────────────────────────────────────────────────────
+    function abrirModal(tipo) { tipoSeleccionado = tipo; actualizarTipoModal(); document.getElementById('modal-crear').classList.add('visible'); setTimeout(() => document.getElementById('modal-nombre').focus(), 100); }
+    function cerrarModal() { document.getElementById('modal-crear').classList.remove('visible'); document.getElementById('modal-nombre').value = ''; }
+    function selTipo(tipo) { tipoSeleccionado = tipo; actualizarTipoModal(); }
+    function actualizarTipoModal() { document.getElementById('tipo-personal').classList.toggle('sel', tipoSeleccionado === 'personal'); document.getElementById('tipo-grupal').classList.toggle('sel', tipoSeleccionado === 'grupal'); }
     async function confirmarCrear() {
-        const n=document.getElementById('modal-nombre').value.trim(); if(!n){document.getElementById('modal-nombre').focus();return;}
-        await fetch('/api/calendarios',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nombre:n,tipo:tipoSeleccionado})});
+        const n = document.getElementById('modal-nombre').value.trim(); if (!n) { document.getElementById('modal-nombre').focus(); return; }
+        await fetch('/api/calendarios', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nombre: n, tipo: tipoSeleccionado }) });
         cerrarModal(); await cargarCalendarios();
     }
 
-    // ── Notas ──
+    // ── Notas ────────────────────────────────────────────────────────────────
     async function cargarNota() {
-        try { const d=await (await fetch('/api/notas')).json(); if(d.texto){document.getElementById('notas-texto').value=d.texto; document.getElementById('notas-estado').textContent='Última nota guardada ✓';} } catch {}
+        try { const d = await (await fetch('/api/notas')).json(); if (d.texto) { document.getElementById('notas-texto').value = d.texto; document.getElementById('notas-estado').textContent = 'Última nota guardada ✓'; } } catch {}
     }
     async function guardarNota() {
-        const texto=document.getElementById('notas-texto').value, est=document.getElementById('notas-estado');
-        try { await fetch('/api/notas',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({texto})}); est.textContent='✓ Guardado'; est.style.color='#06d6a0'; setTimeout(()=>{est.textContent='';est.style.color='';},2000); }
-        catch { est.textContent='Error al guardar'; est.style.color='#fc8181'; }
+        const texto = document.getElementById('notas-texto').value, est = document.getElementById('notas-estado');
+        try { await fetch('/api/notas', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ texto }) }); est.textContent = '✓ Guardado'; est.style.color = '#06d6a0'; setTimeout(() => { est.textContent = ''; est.style.color = ''; }, 2000); }
+        catch { est.textContent = 'Error al guardar'; est.style.color = '#fc8181'; }
     }
 
-    // ── Disponibilidad ──
-    async function cargarBloques() { try { bloques=await (await fetch('/api/disponibilidad')).json(); renderBloques(); } catch {} }
-    function esBloqueActivo(b,dia,min) {
-        if(b.dia!=='todos'&&b.dia!==dia)return false;
-        const [hI,mI]=b.inicio.split(':').map(Number),[hF,mF]=b.fin.split(':').map(Number);
-        const minI=hI*60+mI,minF=hF*60+mF;
-        return minI>minF?(min>=minI||min<=minF):(min>=minI&&min<=minF);
+    // ── Disponibilidad ───────────────────────────────────────────────────────
+    // La API ahora devuelve el campo "id" real de la BD en cada bloque.
+    // Usamos ese id para el DELETE, así no hay problemas con índices desfasados.
+
+    async function cargarBloques() {
+        try {
+            bloques = await (await fetch('/api/disponibilidad')).json();
+            renderBloques();
+        } catch (e) { console.error('Error cargando bloques', e); }
     }
+
+    function esBloqueActivo(b, dia, min) {
+        if (b.dia !== 'todos' && b.dia !== dia) return false;
+        const [hI, mI] = b.inicio.split(':').map(Number), [hF, mF] = b.fin.split(':').map(Number);
+        const minI = hI * 60 + mI, minF = hF * 60 + mF;
+        return minI > minF ? (min >= minI || min <= minF) : (min >= minI && min <= minF);
+    }
+
     function renderBloques() {
-        const c=document.getElementById('lista-bloques');
-        if(!bloques.length){c.innerHTML='<div class="sin-bloques">Todavía no tienes bloques de disponibilidad 🌙</div>';return;}
-        const ahora=new Date(),dia=['domingo','lunes','martes','miercoles','jueves','viernes','sabado'][ahora.getDay()],min=ahora.getHours()*60+ahora.getMinutes();
-        c.innerHTML='';
-        bloques.forEach((b,i)=>{
-            const activo=esBloqueActivo(b,dia,min),div=document.createElement('div'); div.className='bloque-item';
-            div.innerHTML=`<span class="bloque-emoji">${EMOJIS_TIPO[b.tipo]||'⏰'}</span><div class="bloque-info"><div class="bloque-titulo">${activo?'<span class="bloque-activo"></span>':''}${LABELS_TIPO[b.tipo]||b.tipo}${activo?'<span style="font-size:11px;color:#06d6a0"> · activo ahora</span>':''}</div><div class="bloque-detalle">${DIAS_ES[b.dia]||b.dia} · ${b.inicio} – ${b.fin}</div></div><button type="button" class="btn-del-bloque" onclick="eliminarBloque(${i})">🗑</button>`;
+        const c = document.getElementById('lista-bloques');
+        if (!bloques.length) { c.innerHTML = '<div class="sin-bloques">Todavía no tienes bloques de disponibilidad 🌙</div>'; return; }
+        const ahora = new Date(), dia = ['domingo','lunes','martes','miercoles','jueves','viernes','sabado'][ahora.getDay()], min = ahora.getHours() * 60 + ahora.getMinutes();
+        c.innerHTML = '';
+        bloques.forEach(b => {
+            const activo = esBloqueActivo(b, dia, min), div = document.createElement('div'); div.className = 'bloque-item';
+            div.innerHTML = `<span class="bloque-emoji">${EMOJIS_TIPO[b.tipo] || '⏰'}</span>
+                <div class="bloque-info">
+                    <div class="bloque-titulo">${activo ? '<span class="bloque-activo"></span>' : ''}${LABELS_TIPO[b.tipo] || b.tipo}${activo ? '<span style="font-size:11px;color:#06d6a0"> · activo ahora</span>' : ''}</div>
+                    <div class="bloque-detalle">${DIAS_ES[b.dia] || b.dia} · ${b.inicio} – ${b.fin}</div>
+                </div>
+                <button type="button" class="btn-del-bloque" onclick="eliminarBloque(${b.id})">🗑</button>`;
             c.appendChild(div);
         });
     }
-    async function agregarBloque() {
-        const tipo=document.getElementById('disp-tipo').value,dia=document.getElementById('disp-dia').value,inicio=document.getElementById('disp-inicio').value,fin=document.getElementById('disp-fin').value;
-        if(!inicio||!fin)return;
-        await fetch('/api/disponibilidad',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tipo,dia,inicio,fin})});
-        await cargarBloques();
-    }
-    async function eliminarBloque(i) { await fetch(`/api/disponibilidad/${i}`,{method:'DELETE'}); await cargarBloques(); }
 
-    // ── Perfil ──
+    async function agregarBloque() {
+        const tipo   = document.getElementById('disp-tipo').value;
+        const dia    = document.getElementById('disp-dia').value;
+        const inicio = document.getElementById('disp-inicio').value;
+        const fin    = document.getElementById('disp-fin').value;
+        if (!inicio || !fin) return;
+        try {
+            const res = await fetch('/api/disponibilidad', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ tipo, dia, inicio, fin })
+            });
+            if (!res.ok) { const err = await res.json(); console.error('Error al agregar bloque:', err); return; }
+            await cargarBloques();
+        } catch (e) { console.error('Error de red al agregar bloque', e); }
+    }
+
+    async function eliminarBloque(bdId) {
+        // bdId es el id real de la fila en la BD (no el índice del array)
+        try {
+            await fetch(`/api/disponibilidad/borrar/${bdId}`, { method: 'DELETE' });
+            await cargarBloques();
+        } catch (e) { console.error('Error al eliminar bloque', e); }
+    }
+
+    // ── Perfil ───────────────────────────────────────────────────────────────
     function togglePerfil() { document.getElementById('panel-perfil').classList.toggle('visible'); }
     function cambiarFoto(e) {
-        const file=e.target.files[0]; if(!file)return;
-        const r=new FileReader(); r.onload=ev=>{document.getElementById('avatar-emoji').style.display='none';const img=document.getElementById('avatar-img');img.src=ev.target.result;img.style.display='block';localStorage.setItem('lunefia_foto',ev.target.result);}; r.readAsDataURL(file);
+        const file = e.target.files[0]; if (!file) return;
+        const r = new FileReader(); r.onload = ev => { document.getElementById('avatar-emoji').style.display = 'none'; const img = document.getElementById('avatar-img'); img.src = ev.target.result; img.style.display = 'block'; localStorage.setItem('lunefia_foto', ev.target.result); }; r.readAsDataURL(file);
     }
     async function guardarPerfil() {
-        const n=document.getElementById('input-nuevo-nombre').value.trim(),p=document.getElementById('input-nueva-pass').value,c=document.getElementById('input-confirmar-pass').value,msg=document.getElementById('perfil-msg');
-        if(p&&p!==c){msg.style.color='#fc8181';msg.textContent='Las contraseñas no coinciden 💔';return;}
-        const d=await (await fetch('/api/perfil',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nuevo_nombre:n,nueva_pass:p})})).json();
-        if(d.ok){msg.style.color='#06d6a0';msg.textContent='✓ Guardado';if(n)document.getElementById('saludo-usuario').textContent=`Hola, ${n} 👋`;setTimeout(()=>{msg.textContent='';document.getElementById('panel-perfil').classList.remove('visible');},1500);}
-        else{msg.style.color='#fc8181';msg.textContent=d.error||'Error al guardar';}
+        const n = document.getElementById('input-nuevo-nombre').value.trim(), p = document.getElementById('input-nueva-pass').value, c = document.getElementById('input-confirmar-pass').value, msg = document.getElementById('perfil-msg');
+        if (p && p !== c) { msg.style.color = '#fc8181'; msg.textContent = 'Las contraseñas no coinciden 💔'; return; }
+        const d = await (await fetch('/api/perfil', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nuevo_nombre: n, nueva_pass: p }) })).json();
+        if (d.ok) { msg.style.color = '#06d6a0'; msg.textContent = '✓ Guardado'; if (n) document.getElementById('saludo-usuario').textContent = `Hola, ${n} 👋`; setTimeout(() => { msg.textContent = ''; document.getElementById('panel-perfil').classList.remove('visible'); }, 1500); }
+        else { msg.style.color = '#fc8181'; msg.textContent = d.error || 'Error al guardar'; }
     }
 
+    // ── Init ─────────────────────────────────────────────────────────────────
     document.addEventListener('DOMContentLoaded', () => {
-        cargarCalendarios(); cargarMensajeIA(); mostrarMotivacion(); cargarNota(); cargarBloques();
-        document.getElementById('modal-nombre').addEventListener('keydown',e=>{if(e.key==='Enter')confirmarCrear();if(e.key==='Escape')cerrarModal();});
-        document.getElementById('modal-crear').addEventListener('click',function(e){if(e.target===this)cerrarModal();});
-        document.addEventListener('click',function(e){const p=document.getElementById('panel-perfil'),b=document.getElementById('btn-menu');if(!p.contains(e.target)&&!b.contains(e.target))p.classList.remove('visible');});
-        document.getElementById('notas-texto').addEventListener('input',()=>{clearTimeout(notaTimer);document.getElementById('notas-estado').textContent='Escribiendo...';notaTimer=setTimeout(guardarNota,3000);});
-        const foto=localStorage.getItem('lunefia_foto');if(foto){document.getElementById('avatar-emoji').style.display='none';const img=document.getElementById('avatar-img');img.src=foto;img.style.display='block';}
+        cargarCalendarios();
+        cargarMensajeIA();
+        mostrarMotivacion();
+        cargarNota();
+        cargarBloques();
+        document.getElementById('modal-nombre').addEventListener('keydown', e => { if (e.key === 'Enter') confirmarCrear(); if (e.key === 'Escape') cerrarModal(); });
+        document.getElementById('modal-crear').addEventListener('click', function(e) { if (e.target === this) cerrarModal(); });
+        document.addEventListener('click', function(e) { const p = document.getElementById('panel-perfil'), b = document.getElementById('btn-menu'); if (!p.contains(e.target) && !b.contains(e.target)) p.classList.remove('visible'); });
+        document.getElementById('notas-texto').addEventListener('input', () => { clearTimeout(notaTimer); document.getElementById('notas-estado').textContent = 'Escribiendo...'; notaTimer = setTimeout(guardarNota, 3000); });
+        const foto = localStorage.getItem('lunefia_foto'); if (foto) { document.getElementById('avatar-emoji').style.display = 'none'; const img = document.getElementById('avatar-img'); img.src = foto; img.style.display = 'block'; }
     });
 </script>
 </body>
