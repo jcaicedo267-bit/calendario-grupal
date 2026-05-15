@@ -6,7 +6,7 @@ from psycopg2.extras import RealDictCursor
 app = Flask(__name__)
 app.secret_key = "lunefia_secretkey_2026"
 
-DATABASE_URL = os.environ.get("DATABASE_URL")
+DATABASE_URL = "postgresql://admin_lunefia:mhj46c94U8UPA6OeOZbb6TclASkZn0Pz@dpg-d83750lckfvc73bb451g-a.ohio-postgres.render.com/lunefia_db"
 
 def get_db():
     conn = psycopg2.connect(DATABASE_URL, cursor_factory=RealDictCursor)
@@ -31,7 +31,7 @@ def init_db():
             id SERIAL PRIMARY KEY,
             title TEXT,
             start TEXT,
-            end TEXT,
+            end_time TEXT,
             calendario INTEGER,
             dueno TEXT,
             materia TEXT,

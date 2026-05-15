@@ -1,0 +1,78 @@
+[33m14b2d3e[m[33m ([m[1;31morigin/main[m[33m)[m modal invitar personas calendario
+[33md39f713[m resolver conflictos merge
+[33m12ab65a[m evento ampliado, horarios, notas y calendario
+[33md7f52f4[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m)[m bd y lo del jueves
+[33m8720d82[m opcion agregar personas en calendario grupal, mejorar la interfez, etc
+[33m77ab67f[m arreglar el onixe por sextillonesema vez
+[33mc643996[m corregi html y css
+[33m8b050a5[m corregi html y css
+[33mf0de471[m la cagada
+[33m8bdf382[m agregar pagina de notas
+[33mba42f3d[m mostrar nombre usuario en saludo
+[33m8d951e1[m agregar sesiones login y registro
+[33m4ea1089[m fix usuarios.json a lista
+[33mf3d513d[m registro con correo y validaciones
+[33m07ae915[m fix: nombre de usuario dinamico
+[33m8fc0a50[m fix: usuario dinamico en saludo
+[33m70ba148[m fix: mostrar nombre de usuario dinamico
+[33m02e1e43[m renombrar formato_calendario a calendario
+[33mf948a0e[m arreglar home
+[33m781bcc9[m fix: manejar archivos json vacios
+[33mfe30510[m Merge branch 'main' of https://github.com/jcaicedo267-bit/calendario-grupal
+[33m407048e[m arreglar datos de todos los usuarios
+[33m8ac2cf9[m colores morados registro
+[33me692561[m resolver conflictos y ignorar archivos de datos
+[33me035729[m botones morados login
+[33m81b3b55[m arreglar pagina de inicio
+[33mfeff0fa[m cambiar fondo login
+[33m539461d[m agregar login, registro y rutas api
+[33m6d86738[m resolver conflicto eventos.json
+[33m0b94fb4[m[33m ([m[1;35mrefs/stash[m[33m)[m WIP on master: 472cd77 agregar pagina de inicio
+[33m085e9f3[m index on master: 472cd77 agregar pagina de inicio
+[33mf9fa109[m agregar login, registro y rutas api
+[33m906723f[m login y redirección
+[33m29411ed[m resolver conflicto app.py
+[33m472cd77[m agregar pagina de inicio
+[33m8a0700c[m Luna: Cambiada ruta principal a formato_calendario.html
+[33m02c0917[m Luna: Corregido nombre de plantilla a principal.html y manejo de errores
+[33m54617fe[m error iniciar sesion
+[33mfe943e6[m Luna: Login y Registro sincronizados con nombres de formulario
+[33m10bf8fc[m Merge branch 'main' of https://github.com/jcaicedo267-bit/calendario-grupal
+[33m4c4ecdb[m Luna: Corrección de borrado, notas y calendarios
+[33meccf871[m merge fixes
+[33m2d07578[m add gunicorn
+[33m6de1dd0[m Luna: Login y Seguridad guardado y actualizado
+[33mdfe632b[m fix requirements
+[33meafbc48[m resolver conflicto eventos.json
+[33mae9fb2a[m agregar notas y tipos de calendario
+[33maed7a15[m arreglar encuesta agregar evento
+[33m17f861f[m Sincronizando la IA y la API Key
+[33md1c44ef[m descripcion de lo que hiciste
+[33m17c09e6[m Mensajes motivacionales
+[33mfbb98a5[m descripcion de lo que hiciste
+[33mf58ff7f[m arreglar emoji corazon encuesta
+[33mf0d606a[m arreglar el mensaje motivacional de la ia
+[33me275544[m arreglar intervaz visual, agregar interfaz ia
+[33mcc4113f[m Modificar el formulario de eventos
+[33m8054413[m arreglar rutas api
+[33m884dfa5[m descripcion de lo que hiciste
+[33mad561c1[m agregar hora actual
+[33mc5202ae[m boton y encuesta de agregar evento
+[33m12777c1[m descripcion de lo que hiciste
+[33med33913[m Merge branch 'main' of https://github.com/jcaicedo267-bit/calendario-grupal
+[33m5b206d3[m formulario crear evento
+[33m94c2b35[m descripcion de lo que hiciste
+[33m8e12e72[m fix borrar evento
+[33m036a051[m interfaz de guardar evento
+[33m0f41c60[m Finalizada integración de persistencia JSON en rutas de eventos
+[33m747e98e[m diseño CSS y fuente Sour Gummy
+[33m8df43da[m arreglar
+[33mbc10966[m Merge branch 'main' of https://github.com/jcaicedo267-bit/calendario-grupal
+[33me4b6f87[m mejorar apartado visual
+[33m57f41a3[m Finalizando mezcla de cambios
+[33md67fb0c[m Añadida lógica de backend para gestionar eventos y persistencia de datos
+[33m93fefa6[m mejorar el apartado visual
+[33m1eaa2af[m fix requirements
+[33m8ee6d7b[m agregar runtime python 3.12
+[33m1ff62ac[m primer commit de Lunefia
+[33m6c9f158[m Initial commit
