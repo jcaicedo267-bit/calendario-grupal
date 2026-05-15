@@ -1,38 +1,64 @@
 from flask import Flask, render_template, request, jsonify, redirect, session
-import json
 import os
+import psycopg2
+from psycopg2.extras import RealDictCursor
 
 app = Flask(__name__)
-app.secret_key = "lunefia_secretkey_2026"  # clave para las sesiones
+app.secret_key = "lunefia_secretkey_2026"
 
-# -------- ARCHIVOS --------
-ARCHIVO_EVENTOS     = 'eventos.json'
-ARCHIVO_USUARIOS    = 'usuarios.json'
-ARCHIVO_NOTAS       = 'notas.json'
-ARCHIVO_CALENDARIOS = 'calendarios.json'
+DATABASE_URL = os.environ.get("DATABASE_URL")
+
+def get_db():
+    conn = psycopg2.connect(DATABASE_URL, cursor_factory=RealDictCursor)
+    return conn
+
+def init_db():
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS usuarios (
+            nombre TEXT PRIMARY KEY,
+            contrasena TEXT NOT NULL
+        );
+        CREATE TABLE IF NOT EXISTS calendarios (
+            id SERIAL PRIMARY KEY,
+            nombre TEXT,
+            tipo TEXT,
+            dueno TEXT,
+            integrantes TEXT
+        );
+        CREATE TABLE IF NOT EXISTS eventos (
+            id SERIAL PRIMARY KEY,
+            title TEXT,
+            start TEXT,
+            end TEXT,
+            calendario INTEGER,
+            dueno TEXT,
+            materia TEXT,
+            modalidad TEXT,
+            partes TEXT
+        );
+        CREATE TABLE IF NOT EXISTS notas (
+            id SERIAL PRIMARY KEY,
+            usuario TEXT,
+            calendario INTEGER,
+            texto TEXT,
+            UNIQUE(usuario, calendario)
+        );
+    """)
+    conn.commit()
+    cur.close()
+    conn.close()
+
+# Llama init_db al arrancar
+with app.app_context():
+    init_db()
 
 # -------- HELPERS --------
-def cargar_json(archivo, default):
-    if os.path.exists(archivo):
-        try:
-            with open(archivo, 'r') as f:
-                contenido = f.read().strip()
-                if not contenido:
-                    return default
-                return json.loads(contenido)
-        except json.JSONDecodeError:
-            return default
-    return default
-
-def guardar_json(archivo, datos):
-    with open(archivo, 'w') as f:
-        json.dump(datos, f, indent=4)
-
 def usuario_actual():
     return session.get("usuario")
 
 def login_requerido():
-    """Devuelve redirect si no hay sesión, None si sí hay."""
     if not usuario_actual():
         return redirect("/login")
     return None
@@ -55,9 +81,12 @@ def ver_calendario(cal_id):
 def login():
     if request.method == "POST":
         usuario    = request.form.get("usuario")
-        contraseña = request.form.get("contraseña")
-        usuarios   = cargar_json(ARCHIVO_USUARIOS, {})
-        if usuario in usuarios and usuarios[usuario] == contraseña:
+        contrasena = request.form.get("contraseña")
+        conn = get_db(); cur = conn.cursor()
+        cur.execute("SELECT * FROM usuarios WHERE nombre = %s AND contrasena = %s", (usuario, contrasena))
+        user = cur.fetchone()
+        cur.close(); conn.close()
+        if user:
             session["usuario"] = usuario
             return redirect("/")
         return render_template("login.html", error="Usuario o contraseña incorrectos 💔")
@@ -67,16 +96,20 @@ def login():
 def registro():
     if request.method == "POST":
         usuario    = request.form.get("usuario")
-        contraseña = request.form.get("contraseña")
-        if not usuario or not contraseña:
+        contrasena = request.form.get("contraseña")
+        if not usuario or not contrasena:
             return render_template("registro.html", error="Completa todos los campos 💔")
-        usuarios = cargar_json(ARCHIVO_USUARIOS, {})
-        if usuario in usuarios:
+        conn = get_db(); cur = conn.cursor()
+        try:
+            cur.execute("INSERT INTO usuarios (nombre, contrasena) VALUES (%s, %s)", (usuario, contrasena))
+            conn.commit()
+            session["usuario"] = usuario
+            cur.close(); conn.close()
+            return redirect("/")
+        except psycopg2.errors.UniqueViolation:
+            conn.rollback()
+            cur.close(); conn.close()
             return render_template("registro.html", error="Ese usuario ya existe 💔")
-        usuarios[usuario] = contraseña
-        guardar_json(ARCHIVO_USUARIOS, usuarios)
-        session["usuario"] = usuario
-        return redirect("/")
     return render_template("registro.html")
 
 @app.route("/logout")
@@ -89,43 +122,42 @@ def logout():
 def manejar_calendarios():
     redir = login_requerido()
     if redir: return jsonify({"error": "no autenticado"}), 401
-
     usuario = usuario_actual()
-    calendarios = cargar_json(ARCHIVO_CALENDARIOS, [])
+    conn = get_db(); cur = conn.cursor()
 
     if request.method == "POST":
         datos = request.get_json()
-        # Asignar ID único y dueño
-        datos["id"]    = max([c.get("id", 0) for c in calendarios], default=0) + 1
-        datos["dueño"] = usuario
-        calendarios.append(datos)
-        guardar_json(ARCHIVO_CALENDARIOS, calendarios)
-        return jsonify({"mensaje": "Calendario guardado 💖", "id": datos["id"]})
+        cur.execute(
+            "INSERT INTO calendarios (nombre, tipo, dueno, integrantes) VALUES (%s, %s, %s, %s) RETURNING id",
+            (datos.get("nombre"), datos.get("tipo"), usuario, datos.get("integrantes", ""))
+        )
+        new_id = cur.fetchone()["id"]
+        conn.commit(); cur.close(); conn.close()
+        return jsonify({"mensaje": "Calendario guardado 💖", "id": new_id})
 
-    # GET: devolver grupales + los personales del usuario
-    visibles = [
-        c for c in calendarios
-        if c.get("tipo") == "grupal" or c.get("dueño") == usuario
-    ]
-    return jsonify(visibles)
+    cur.execute(
+        "SELECT * FROM calendarios WHERE tipo = 'grupal' OR dueno = %s", (usuario,)
+    )
+    calendarios = cur.fetchall()
+    cur.close(); conn.close()
+    return jsonify([dict(c) for c in calendarios])
 
 @app.route("/api/calendarios/<int:cal_id>", methods=["DELETE"])
 def borrar_calendario(cal_id):
     redir = login_requerido()
     if redir: return jsonify({"error": "no autenticado"}), 401
-
     usuario = usuario_actual()
-    calendarios = cargar_json(ARCHIVO_CALENDARIOS, [])
-    cal = next((c for c in calendarios if c.get("id") == cal_id), None)
-
+    conn = get_db(); cur = conn.cursor()
+    cur.execute("SELECT * FROM calendarios WHERE id = %s", (cal_id,))
+    cal = cur.fetchone()
     if not cal:
+        cur.close(); conn.close()
         return jsonify({"error": "no encontrado"}), 404
-    # Solo el dueño puede borrar
-    if cal.get("dueño") != usuario:
+    if cal["dueno"] != usuario:
+        cur.close(); conn.close()
         return jsonify({"error": "sin permiso"}), 403
-
-    calendarios = [c for c in calendarios if c.get("id") != cal_id]
-    guardar_json(ARCHIVO_CALENDARIOS, calendarios)
+    cur.execute("DELETE FROM calendarios WHERE id = %s", (cal_id,))
+    conn.commit(); cur.close(); conn.close()
     return jsonify({"mensaje": "Calendario eliminado"})
 
 # -------- EVENTOS --------
@@ -133,60 +165,55 @@ def borrar_calendario(cal_id):
 def manejar_eventos():
     redir = login_requerido()
     if redir: return jsonify({"error": "no autenticado"}), 401
-
     usuario = usuario_actual()
-    eventos = cargar_json(ARCHIVO_EVENTOS, [])
+    conn = get_db(); cur = conn.cursor()
 
     if request.method == "POST":
-        nuevo = request.get_json()
-        nuevo["dueño"] = usuario
-        eventos.append(nuevo)
-        guardar_json(ARCHIVO_EVENTOS, eventos)
+        e = request.get_json()
+        cur.execute(
+            "INSERT INTO eventos (title, start, \"end\", calendario, dueno, materia, modalidad, partes) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
+            (e.get("title"), e.get("start"), e.get("end"), e.get("calendario"), usuario,
+             e.get("materia"), e.get("modalidad"), e.get("partes"))
+        )
+        conn.commit(); cur.close(); conn.close()
         return jsonify({"mensaje": "Evento guardado correctamente"}), 201
 
-    # GET: filtrar por calendario si se pasa el parámetro
     cal_id = request.args.get("calendario")
-    calendarios = cargar_json(ARCHIVO_CALENDARIOS, [])
-
     if cal_id:
-        cal = next((c for c in calendarios if str(c.get("id")) == str(cal_id)), None)
+        cur.execute("SELECT * FROM calendarios WHERE id = %s", (cal_id,))
+        cal = cur.fetchone()
         if cal:
-            if cal.get("tipo") == "grupal":
-                # Calendario grupal: todos ven todos los eventos
-                resultado = [e for e in eventos if str(e.get("calendario")) == str(cal_id)]
+            if cal["tipo"] == "grupal":
+                cur.execute("SELECT * FROM eventos WHERE calendario = %s", (cal_id,))
             else:
-                # Calendario personal: solo los del dueño
-                resultado = [
-                    e for e in eventos
-                    if str(e.get("calendario")) == str(cal_id) and e.get("dueño") == usuario
-                ]
+                cur.execute("SELECT * FROM eventos WHERE calendario = %s AND dueno = %s", (cal_id, usuario))
+            resultado = cur.fetchall()
         else:
             resultado = []
     else:
-        # Sin filtro: eventos del usuario + eventos de calendarios grupales
-        grupales = {str(c["id"]) for c in calendarios if c.get("tipo") == "grupal"}
-        resultado = [
-            e for e in eventos
-            if e.get("dueño") == usuario or str(e.get("calendario")) in grupales
-        ]
+        cur.execute("SELECT id FROM calendarios WHERE tipo = 'grupal'")
+        grupales = [str(r["id"]) for r in cur.fetchall()]
+        if grupales:
+            cur.execute(
+                f"SELECT * FROM eventos WHERE dueno = %s OR calendario::text = ANY(%s)",
+                (usuario, grupales)
+            )
+        else:
+            cur.execute("SELECT * FROM eventos WHERE dueno = %s", (usuario,))
+        resultado = cur.fetchall()
 
-    return jsonify(resultado)
+    cur.close(); conn.close()
+    return jsonify([dict(e) for e in resultado])
 
 @app.route("/api/eventos/borrar", methods=["POST"])
 def borrar_evento():
     redir = login_requerido()
     if redir: return jsonify({"error": "no autenticado"}), 401
-
     usuario = usuario_actual()
-    eventos = cargar_json(ARCHIVO_EVENTOS, [])
-    datos   = request.get_json()
-
-    # Solo borrar eventos propios (o en calendario grupal si eres el dueño del evento)
-    eventos = [
-        e for e in eventos
-        if not (e.get("title") == datos.get("titulo") and e.get("dueño") == usuario)
-    ]
-    guardar_json(ARCHIVO_EVENTOS, eventos)
+    datos = request.get_json()
+    conn = get_db(); cur = conn.cursor()
+    cur.execute("DELETE FROM eventos WHERE title = %s AND dueno = %s", (datos.get("titulo"), usuario))
+    conn.commit(); cur.close(); conn.close()
     return jsonify({"mensaje": "Evento eliminado"})
 
 # -------- NOTAS --------
@@ -194,53 +221,50 @@ def borrar_evento():
 def manejar_notas():
     redir = login_requerido()
     if redir: return jsonify({"error": "no autenticado"}), 401
-
     usuario = usuario_actual()
-    notas   = cargar_json(ARCHIVO_NOTAS, [])
-    cal_id  = request.args.get("calendario") or (request.get_json() or {}).get("calendario")
+    conn = get_db(); cur = conn.cursor()
 
     if request.method == "POST":
         datos = request.get_json()
-        # Reemplazar nota existente del mismo usuario y calendario
-        notas = [
-            n for n in notas
-            if not (n.get("usuario") == usuario and str(n.get("calendario")) == str(datos.get("calendario")))
-        ]
-        notas.append({"usuario": usuario, "calendario": datos.get("calendario"), "texto": datos.get("texto")})
-        guardar_json(ARCHIVO_NOTAS, notas)
+        cur.execute(
+            """INSERT INTO notas (usuario, calendario, texto) VALUES (%s, %s, %s)
+               ON CONFLICT (usuario, calendario) DO UPDATE SET texto = EXCLUDED.texto""",
+            (usuario, datos.get("calendario"), datos.get("texto"))
+        )
+        conn.commit(); cur.close(); conn.close()
         return jsonify({"mensaje": "Nota guardada ✨"})
 
-    # GET: buscar nota del usuario para ese calendario
-    nota = next(
-        (n for n in notas if n.get("usuario") == usuario and str(n.get("calendario")) == str(cal_id)),
-        None
-    )
+    cal_id = request.args.get("calendario")
+    cur.execute("SELECT texto FROM notas WHERE usuario = %s AND calendario = %s", (usuario, cal_id))
+    nota = cur.fetchone()
+    cur.close(); conn.close()
     return jsonify({"texto": nota["texto"] if nota else ""})
 
-if __name__ == "__main__":
-    app.run(debug=True)
-
+# -------- PERFIL --------
 @app.route("/api/perfil", methods=["POST"])
 def actualizar_perfil():
     redir = login_requerido()
     if redir: return jsonify({"error": "no autenticado"}), 401
-    
     usuario_viejo = usuario_actual()
     datos = request.get_json()
     nuevo_nombre = datos.get("nuevo_nombre", "").strip()
     nueva_pass   = datos.get("nueva_pass", "").strip()
-    
-    usuarios = cargar_json(ARCHIVO_USUARIOS, {})
-    
+    conn = get_db(); cur = conn.cursor()
+
     if nuevo_nombre and nuevo_nombre != usuario_viejo:
-        if nuevo_nombre in usuarios:
+        cur.execute("SELECT nombre FROM usuarios WHERE nombre = %s", (nuevo_nombre,))
+        if cur.fetchone():
+            cur.close(); conn.close()
             return jsonify({"ok": False, "error": "Ese nombre ya existe 💔"})
-        usuarios[nuevo_nombre] = usuarios.pop(usuario_viejo)
+        cur.execute("UPDATE usuarios SET nombre = %s WHERE nombre = %s", (nuevo_nombre, usuario_viejo))
         session["usuario"] = nuevo_nombre
         usuario_viejo = nuevo_nombre
-    
+
     if nueva_pass:
-        usuarios[usuario_viejo] = nueva_pass
-    
-    guardar_json(ARCHIVO_USUARIOS, usuarios)
+        cur.execute("UPDATE usuarios SET contrasena = %s WHERE nombre = %s", (nueva_pass, usuario_viejo))
+
+    conn.commit(); cur.close(); conn.close()
     return jsonify({"ok": True})
+
+if __name__ == "__main__":
+    app.run(debug=True)
