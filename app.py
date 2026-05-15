@@ -228,16 +228,23 @@ def manejar_notas():
 
     if request.method == "POST":
         datos = request.get_json()
-        cur.execute(
-            """INSERT INTO notas (usuario, calendario, texto) VALUES (%s, %s, %s)
-               ON CONFLICT (usuario, calendario) DO UPDATE SET texto = EXCLUDED.texto""",
-            (usuario, datos.get("calendario"), datos.get("texto"))
-        )
+        cal_id = datos.get("calendario")
+        texto  = datos.get("texto", "")
+        if cal_id is None:
+            cur.execute("DELETE FROM notas WHERE usuario = %s AND calendario IS NULL", (usuario,))
+            cur.execute("INSERT INTO notas (usuario, calendario, texto) VALUES (%s, NULL, %s)", (usuario, texto))
+        else:
+            cur.execute("""INSERT INTO notas (usuario, calendario, texto) VALUES (%s, %s, %s)
+                           ON CONFLICT (usuario, calendario) DO UPDATE SET texto = EXCLUDED.texto""",
+                        (usuario, cal_id, texto))
         conn.commit(); cur.close(); conn.close()
         return jsonify({"mensaje": "Nota guardada ✨"})
 
     cal_id = request.args.get("calendario")
-    cur.execute("SELECT texto FROM notas WHERE usuario = %s AND calendario = %s", (usuario, cal_id))
+    if cal_id is None:
+        cur.execute("SELECT texto FROM notas WHERE usuario = %s AND calendario IS NULL", (usuario,))
+    else:
+        cur.execute("SELECT texto FROM notas WHERE usuario = %s AND calendario = %s", (usuario, cal_id))
     nota = cur.fetchone()
     cur.close(); conn.close()
     return jsonify({"texto": nota["texto"] if nota else ""})
