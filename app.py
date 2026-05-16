@@ -388,7 +388,8 @@ def editar_evento():
     conn.commit(); cur.close(); conn.close()
     return jsonify({"mensaje": "Evento editado ✨"})
 
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 
 GEMINI_API_KEY = "AIzaSyBghguqbfF036-faMD-AmRHMpBNq8Nc0Bo"
 
