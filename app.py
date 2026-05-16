@@ -206,9 +206,21 @@ def manejar_eventos():
         else:
             cur.execute("SELECT * FROM eventos WHERE dueno = %s", (usuario,))
         resultado = cur.fetchall()
-
     cur.close(); conn.close()
-    return jsonify([dict(e) for e in resultado])
+
+    return jsonify([{
+        "id": e["id"],
+        "title": e["title"],
+        "start": e["start"],
+        "end": e["end_time"],
+        "calendario": e["calendario"],
+        "dueno": e["dueno"],
+        "extendedProps": {
+            "tipo": e["materia"],
+            "materia": e["materia"],
+            "dueno": e["dueno"]
+        }
+    } for e in resultado])
 
 @app.route("/api/eventos/borrar", methods=["POST"])
 def borrar_evento():
@@ -358,6 +370,20 @@ def limpiar_db():
     count = cur.rowcount 
     cur.close(); conn.close()
     return f"Eliminados {count} registros corruptos ✓"
+
+@app.route("/api/eventos/editar", methods=["POST"])
+def editar_evento():
+    usuario, err = api_auth()
+    if err: return err
+    datos = request.get_json()
+    conn = get_db(); cur = conn.cursor()
+    cur.execute("""
+        UPDATE eventos SET title=%s, start=%s, end_time=%s, materia=%s
+        WHERE title=%s AND dueno=%s AND calendario=%s
+    """, (datos.get("title"), datos.get("start"), datos.get("end"),
+          datos.get("materia"), datos.get("titulo_original"), usuario, datos.get("calendario")))
+    conn.commit(); cur.close(); conn.close()
+    return jsonify({"mensaje": "Evento editado ✨"})
 
 if __name__ == "__main__":
     app.run(debug=True)

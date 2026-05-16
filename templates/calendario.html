@@ -169,7 +169,9 @@
         <label>Hora de inicio:</label>
         <input type="time" id="hora-inicio">
         <label>Hora de finalización:</label>
-        <input type="time" id="hora-final">
+        <input type="time" id="hora-fin">
+        <label>Fecha de finalización (si es otro día):</label>
+        <input type="date" id="fecha-fin">
         <label>Materia:</label>
         <input type="text" id="materia" placeholder="Ej: Biología, Matemáticas...">
         <label>Tipo:</label>
@@ -182,19 +184,62 @@
         <button id="btn-cancelar" onclick="togglePanel()">Cancelar</button>
     </div>
 
-    <!-- Modal borrar -->
-    <div id="modal-borrar" style="display:none">
-        <div id="modal-caja">
-            <p id="modal-texto">¿Borrar este evento?</p>
-            <div id="modal-botones">
-                <button id="modal-confirmar">🗑 Borrar</button>
-                <button id="modal-cancelar" onclick="cerrarModal()">Cancelar</button>
-            </div>
+    <!-- Modal detalle/editar evento -->
+<div id="modal-detalle" style="display:none">
+    <div id="modal-detalle-caja">
+        <div id="modal-detalle-header">
+            <h3 id="detalle-titulo-display"></h3>
+            <span id="detalle-creador"></span>
+        </div>
+        <div class="detalle-campo">
+            <label>Nombre</label>
+            <input type="text" id="detalle-titulo-input">
+        </div>
+        <div class="detalle-campo">
+            <label>Fecha</label>
+            <input type="date" id="detalle-fecha">
+        </div>
+        <div class="detalle-campo">
+            <label>Hora inicio</label>
+            <input type="time" id="detalle-hora-inicio">
+        </div>
+        <div class="detalle-campo">
+            <label>Hora fin</label>
+            <input type="time" id="detalle-hora-fin">
+        </div>
+        <div class="detalle-campo">
+            <label>Materia</label>
+            <input type="text" id="detalle-materia">
+        </div>
+        <div class="detalle-campo">
+            <label>Tipo</label>
+            <select id="detalle-tipo">
+                <option value="tarea">📘 Tarea</option>
+                <option value="examen">📕 Examen</option>
+                <option value="proyecto">📗 Proyecto</option>
+            </select>
+        </div>
+        <div id="detalle-botones">
+            <button id="btn-guardar-edicion" onclick="guardarEdicion()">Guardar cambios ✨</button>
+            <button id="btn-borrar-evento" onclick="pedirConfirmacion()">🗑 Borrar</button>
+            <button id="btn-cerrar-detalle" onclick="cerrarDetalle()">Cancelar</button>
         </div>
     </div>
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
-    <script>
+<!-- Modal confirmación borrar -->
+<div id="modal-confirmar-borrar" style="display:none">
+    <div id="modal-caja">
+        <p id="modal-texto">¿Estás segura de querer borrar este evento?</p>
+        <div id="modal-botones">
+            <button id="modal-confirmar">🗑 Sí, borrar</button>
+            <button id="modal-cancelar" onclick="cerrarConfirmacion()">Cancelar</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+<script>
         // Obtener el ID del calendario de la URL: /calendario/<id>
         const calId = window.location.pathname.split('/').pop();
 
@@ -248,16 +293,19 @@
                     }
                 },
                 eventClick: function(info) {
-                    const modal = document.getElementById('modal-borrar');
-                    document.getElementById('modal-texto').textContent = '¿Borrar "' + info.event.title + '"?';
-                    modal.style.display = 'flex';
-                    document.getElementById('modal-confirmar').onclick = function() {
-                        fetch('/api/eventos/borrar', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ titulo: info.event.title, calendario: calId })
-                        }).then(() => location.reload());
-                    };
+                    eventoActual = info.event;
+                    const ext = info.event.extendedProps;
+                    document.getElementById('detalle-titulo-display').textContent = info.event.title;
+                    document.getElementById('detalle-creador').textContent = ext.dueno ? '👤 Creado por ' + ext.dueno : '';
+                    document.getElementById('detalle-titulo-input').value = info.event.title;
+                    const start = info.event.start;
+                    document.getElementById('detalle-fecha').value = start ? start.toISOString().split('T')[0] : '';
+                    document.getElementById('detalle-hora-inicio').value = start ? start.toTimeString().slice(0,5) : '';
+                    const end = info.event.end;
+                    document.getElementById('detalle-hora-fin').value = end ? end.toTimeString().slice(0,5) : '';
+                    document.getElementById('detalle-materia').value = ext.materia || '';
+                    document.getElementById('detalle-tipo').value = ext.tipo || 'tarea';
+                    document.getElementById('modal-detalle').style.display = 'flex';
                 },
             });
             cal.render();
@@ -276,20 +324,38 @@
         }
 
         async function guardarEvento() {
-            const titulo  = document.getElementById('titulo').value;
-            const fecha   = document.getElementById('fecha').value;
-            const horaInicio = document.getElementById('hora-inicio').value;
-            const horaFin   = document.getElementById('hora-fin').value;
-            const tipo    = document.getElementById('tipo').value;
-            const materia = document.getElementById('materia').value;
-            await fetch('/api/eventos', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ title: titulo, start: fecha + 'T' + horaInicio, end: fecha + 'T' + horaFin, tipo, materia, calendario: calId })
-            });
-            togglePanel();
-            location.reload();
+        const titulo     = document.getElementById('titulo').value;
+        const fecha      = document.getElementById('fecha').value;
+        const horaInicio = document.getElementById('hora-inicio').value;
+        const horaFin    = document.getElementById('hora-fin').value;
+        const fechaFin   = document.getElementById('fecha-fin').value || fecha;
+        const tipo       = document.getElementById('tipo').value;
+        const materia    = document.getElementById('materia').value;
+
+        if (!titulo || !fecha || !horaInicio || !horaFin) {
+            alert('Completa todos los campos obligatorios 💔'); return;
         }
+
+        const startDT = new Date(fecha + 'T' + horaInicio);
+        const endDT   = new Date(fechaFin + 'T' + horaFin);
+
+        if (endDT <= startDT) {
+            alert('La hora de finalización debe ser después de la hora de inicio 💔'); return;
+        }
+
+        await fetch('/api/eventos', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                title: titulo,
+                start: fecha + 'T' + horaInicio,
+                end: fechaFin + 'T' + horaFin,
+                tipo, materia, calendario: calId
+            })
+        });
+        togglePanel();
+        location.reload();
+    }
 
         async function cargarMensajeIA() {
             const el = document.getElementById('ia-mensaje');
@@ -352,6 +418,38 @@
             btn.textContent = '✓ Guardado';
             setTimeout(() => btn.textContent = 'Guardar', 1500);
         }
+
+     let eventoActual = null;
+
+function cerrarDetalle() { document.getElementById('modal-detalle').style.display = 'none'; }
+function cerrarConfirmacion() { document.getElementById('modal-confirmar-borrar').style.display = 'none'; }
+
+function pedirConfirmacion() {
+    document.getElementById('modal-confirmar-borrar').style.display = 'flex';
+    document.getElementById('modal-confirmar').onclick = async function() {
+        await fetch('/api/eventos/borrar', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ titulo: eventoActual.title, calendario: calId })
+        });
+        cerrarConfirmacion(); cerrarDetalle(); location.reload();
+    };
+}
+
+async function guardarEdicion() {
+    const titulo = document.getElementById('detalle-titulo-input').value;
+    const fecha  = document.getElementById('detalle-fecha').value;
+    const hIni   = document.getElementById('detalle-hora-inicio').value;
+    const hFin   = document.getElementById('detalle-hora-fin').value;
+    const materia= document.getElementById('detalle-materia').value;
+    const tipo   = document.getElementById('detalle-tipo').value;
+    await fetch('/api/eventos/editar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ titulo_original: eventoActual.title, title: titulo, start: fecha+'T'+hIni, end: fecha+'T'+hFin, materia, tipo, calendario: calId })
+    });
+    cerrarDetalle(); location.reload();
+}
     </script>
 
 </body>

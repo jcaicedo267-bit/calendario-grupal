@@ -947,3 +947,30 @@ body::before {
 
 .fc-icon-chevron-left::before  { content: '‹' !important; font-size: 18px; }
 .fc-icon-chevron-right::before { content: '›' !important; font-size: 18px; }
+
+#modal-detalle {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 2000; backdrop-filter: blur(4px);
+}
+#modal-detalle-caja {
+    background: rgba(22,12,55,0.97); border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 16px; padding: 24px 28px; width: 320px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+}
+#modal-detalle-header { margin-bottom: 16px; }
+#modal-detalle-header h3 { font-size: 16px; color: #fff; margin-bottom: 4px; }
+#detalle-creador { font-size: 11px; color: rgba(255,255,255,0.4); }
+.detalle-campo { margin-bottom: 10px; }
+.detalle-campo label { display: block; font-size: 10px; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px; }
+.detalle-campo input, .detalle-campo select {
+    width: 100%; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 8px; padding: 8px 10px; color: rgba(255,255,255,0.85);
+    font-size: 13px; font-family: 'Sour Gummy', sans-serif; outline: none;
+}
+.detalle-campo select option { background: #1a0d3d; }
+#detalle-botones { display: flex; gap: 8px; margin-top: 16px; }
+#btn-guardar-edicion { flex: 1; padding: 10px; background: linear-gradient(135deg, #5b3fd4, #7c5ce8); color: white; border: none; border-radius: 8px; font-size: 12px; font-family: 'Sour Gummy', sans-serif; cursor: pointer; }
+#btn-borrar-evento { padding: 10px 14px; background: linear-gradient(135deg, #c0392b, #e74c3c); color: white; border: none; border-radius: 8px; font-size: 12px; font-family: 'Sour Gummy', sans-serif; cursor: pointer; }
+#btn-cerrar-detalle { padding: 10px 14px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.7); border-radius: 8px; font-size: 12px; font-family: 'Sour Gummy', sans-serif; cursor: pointer; }
+#modal-confirmar-borrar { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 3000; backdrop-filter: blur(4px); }
