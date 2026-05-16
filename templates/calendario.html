@@ -450,7 +450,57 @@ async function guardarEdicion() {
     });
     cerrarDetalle(); location.reload();
 }
+
+function toggleChat() {
+    const c = document.getElementById('chat-ia');
+    c.style.display = c.style.display === 'none' ? 'flex' : 'none';
+}
+function cerrarChat() { document.getElementById('chat-ia').style.display = 'none'; }
+
+async function enviarMensaje() {
+    const input = document.getElementById('chat-input');
+    const mensaje = input.value.trim();
+    if (!mensaje) return;
+    input.value = '';
+    const mensajes = document.getElementById('chat-mensajes');
+    const divUser = document.createElement('div');
+    divUser.className = 'msg-usuario';
+    divUser.textContent = mensaje;
+    mensajes.appendChild(divUser);
+    mensajes.scrollTop = mensajes.scrollHeight;
+    const divIA = document.createElement('div');
+    divIA.className = 'msg-ia';
+    divIA.textContent = '🌙 escribiendo...';
+    mensajes.appendChild(divIA);
+    try {
+        const res = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ mensaje, calendario: calId })
+        });
+        const data = await res.json();
+        divIA.textContent = data.respuesta;
+    } catch {
+        divIA.textContent = 'Error al conectar con la IA 💔';
+    }
+    mensajes.scrollTop = mensajes.scrollHeight;
+}
+
     </script>
+
+<!-- Chat IA -->
+<div id="chat-ia" style="display:none">
+    <div id="chat-header">
+        <span>🌙 Lunefia IA</span>
+        <button onclick="cerrarChat()">✕</button>
+    </div>
+    <div id="chat-mensajes"></div>
+    <div id="chat-input-area">
+        <input type="text" id="chat-input" placeholder="Escríbele a Lunefia IA..." onkeydown="if(event.key==='Enter')enviarMensaje()">
+        <button onclick="enviarMensaje()">➤</button>
+    </div>
+</div>
+<button id="btn-chat" onclick="toggleChat()">🌙</button>
 
 </body>
 </html>

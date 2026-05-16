@@ -2,6 +2,9 @@ from flask import Flask, render_template, request, jsonify, redirect, session
 import os
 import psycopg2
 from psycopg2.extras import RealDictCursor
+import anthropic
+from google import genai
+from google.genai import types
 
 app = Flask(__name__)
 app.secret_key = "lunefia_secretkey_2026"
@@ -384,6 +387,46 @@ def editar_evento():
           datos.get("materia"), datos.get("titulo_original"), usuario, datos.get("calendario")))
     conn.commit(); cur.close(); conn.close()
     return jsonify({"mensaje": "Evento editado ✨"})
+
+import google.generativeai as genai
+
+GEMINI_API_KEY = "AIzaSyBghguqbfF036-faMD-AmRHMpBNq8Nc0Bo"
+
+@app.route("/api/chat", methods=["POST"])
+def chat_ia():
+    usuario, err = api_auth()
+    if err: return err
+    datos = request.get_json()
+    mensaje = datos.get("mensaje", "")
+    cal_id  = datos.get("calendario")
+
+    conn = get_db(); cur = conn.cursor()
+    cur.execute("SELECT nombre, tipo FROM calendarios WHERE id = %s", (cal_id,))
+    cal = cur.fetchone()
+    cur.execute("SELECT title, start, end_time, materia FROM eventos WHERE calendario = %s ORDER BY start", (cal_id,))
+    eventos = cur.fetchall()
+    cur.close(); conn.close()
+
+    eventos_txt = "\n".join([
+        f"- {e['title']} ({e['materia'] or 'sin materia'}) el {e['start']}" +
+        (f" hasta {e['end_time']}" if e['end_time'] else "")
+        for e in eventos
+    ]) or "No hay eventos en este calendario."
+
+    sistema = f"""Eres Lunefia IA, una asistente amigable para el calendario '{cal['nombre'] if cal else 'desconocido'}' (tipo: {cal['tipo'] if cal else 'personal'}).
+Ayudas al usuario {usuario} con sus tareas, exámenes y proyectos.
+Hablas en español, eres cálida y motivadora. Usas emojis con moderación.
+Eventos actuales en este calendario:
+{eventos_txt}
+Responde de forma concisa y útil."""
+
+    cliente = genai.Client(api_key="AIzaSyBghguqbfF036-faMD-AmRHMpBNq8Nc0Bo")
+    respuesta = cliente.models.generate_content(
+        model="gemini-2.0-flash",
+        config=types.GenerateContentConfig(system_instruction=sistema),
+        contents=mensaje
+    )
+    return jsonify({"respuesta": respuesta.text})
 
 if __name__ == "__main__":
     app.run(debug=True)
